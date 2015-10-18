@@ -11,6 +11,7 @@
     <SccLocalPath />
     <ProjectGuid>{F4A7A584-A34C-E964-CC1F-F8D7438A33C6}</ProjectGuid>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>dyd_achievements</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
