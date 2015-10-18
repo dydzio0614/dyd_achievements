@@ -11,6 +11,7 @@ enum dyd_achievement_types
 struct dyd_achievement
 {
 	enum dyd_achievement_types type; //sorting achievements by types
+	int id_numeric; //main achievement ID
 	char* identifier; //unique name for preserving in lugormod account data
 	char* name; //name to display in console
 	char* description; //description to display in console

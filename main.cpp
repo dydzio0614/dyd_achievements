@@ -24,6 +24,7 @@ int g_vmbase = 0;
 level_locals_t* g_level = (level_locals_t*)0x20ae90b8;
 
 struct dyd_achievement *achievements[32];
+int numericId = 1;
 
 
 C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginres_t* presult, pluginfuncs_t* pluginfuncs, int iscmd)
@@ -242,11 +243,11 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					{
 						if (Accounts_Custom_GetValue(user->client->pers.Lmd.account, achievements[i]->identifier) == NULL)
 						{
-							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^3%s (ID: %s)\n\"", achievements[i]->name, achievements[i]->identifier));
+							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^3%d. %s\n\"", achievements[i]->id_numeric, achievements[i]->name));
 						}
 						else
 						{
-							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%s (ID: %s) - COMPLETED\n\"", achievements[i]->name, achievements[i]->identifier));
+							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%d. %s - COMPLETED\n\"", achievements[i]->id_numeric, achievements[i]->name));
 						}
 
 						if (!stricmp(arg, "ext"))
@@ -268,13 +269,13 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements help - displays this help page \n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements show <ID> - displays detailed information about specific achievement\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements claim <ID> - use to complete claimable achievements.\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1IMPORTANT! ID is text identifier usually shown together with achievement name. Using anything else instead at places where ID is required will not work.\n\"");
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1IMPORTANT! ID is number usually shown together with achievement name. Using anything else instead at places where ID is required will not work.\n\"");
 				JASS_RET_SUPERCEDE(1);
 			}
 
 			else if (!stricmp(arg, "claim"))
 			{
-				char name[64];
+				char id[16];
 
 				if (g_syscall(G_ARGC) < 3)
 				{
@@ -282,10 +283,10 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				}
 				else
 				{
-					g_syscall(G_ARGV, 2, name, sizeof(name));
+					g_syscall(G_ARGV, 2, id, sizeof(id));
 					for (int i = 0; achievements[i] != NULL; i++)
 					{
-						if (!stricmp(achievements[i]->identifier, name))
+						if (achievements[i]->id_numeric == strtol(id, NULL, 0))
 						{
 							if (achievements[i]->autoclaimable == qfalse)
 							{
@@ -303,7 +304,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 
 			else if (!stricmp(arg, "show"))
 			{
-				char name[64];
+				char id[16];
 
 				if (g_syscall(G_ARGC) < 3)
 				{
@@ -311,12 +312,12 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				}
 				else
 				{
-					g_syscall(G_ARGV, 2, name, 64);
+					g_syscall(G_ARGV, 2, id, sizeof(id));
 					for (int i = 0; achievements[i] != NULL; i++)
 					{
-						if (!stricmp(achievements[i]->identifier, name))
+						if (achievements[i]->id_numeric == strtol(id, NULL, 0))
 						{
-							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%s\n\"",achievements[i]->description)); 
+							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%s\n^6%s\n\"", achievements[i]->name, achievements[i]->description)); 
 							achievements_progress(user, achievements[i]->identifier, qtrue);
 							JASS_RET_SUPERCEDE(1);
 						}
@@ -359,12 +360,13 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 {
 	if (!stricmp(x, "ACHIEVEMENT_MISC_PLAYTIME1"))
 	{
-		int time = user->client->pers.Lmd.account->time;
+		int time = user->client->pers.Lmd.account->time; //seconds
+		int hours = time / 3600;
 		if (time >= 90000)
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/25 hours - you finished the goal\n\"", time / 3600000));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/25 hours - you finished the goal\n\"", hours));
 			}
 			return 1;
 		}
@@ -372,7 +374,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/25 hours\n\"", time / 3600000));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/25 hours\n\"", hours));
 			}
 			return 0;
 		}
@@ -380,12 +382,13 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 
 	else if (!stricmp(x, "ACHIEVEMENT_MISC_PLAYTIME2"))
 	{
-		int time = user->client->pers.Lmd.account->time;
+		int time = user->client->pers.Lmd.account->time; //seconds
+		int hours = time / 3600;
 		if (time >= 360000)
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/25 hours - you finished the goal\n\"", time / 3600000));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/25 hours - you finished the goal\n\"", hours));
 			}
 			return 1;
 		}
@@ -393,7 +396,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/100 hours\n\"", time / 3600000));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/100 hours\n\"", hours));
 			}
 			return 0;
 		}
@@ -446,11 +449,11 @@ void achievements_list(gentity_t *user, enum dyd_achievement_types type, qboolea
 		{
 			if (Accounts_Custom_GetValue(user->client->pers.Lmd.account, achievements[i]->identifier) == NULL) //checking for completion
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%s (ID: %s)\n\"", achievements[i]->name, achievements[i]->identifier));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%d. %s\n\"", achievements[i]->id_numeric, achievements[i]->name));
 			}
 			else
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2%s (ID: %s) - COMPLETED\n\"", achievements[i]->name, achievements[i]->identifier));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2%d. %s - COMPLETED\n\"", achievements[i]->id_numeric, achievements[i]->name));
 			}
 
 			if (extended == qtrue)
@@ -468,10 +471,11 @@ void achievements_list(gentity_t *user, enum dyd_achievement_types type, qboolea
 }
 
 
-void achievements_init() //server start achievement allocation, change achievements_check() too for not autoclaimable achievements if adding new
+void achievements_init() //server start achievement allocation, change achievements_progress() too for not autoclaimable achievements if adding new
 {
 	achievements[0] = (dyd_achievement*) malloc(sizeof dyd_achievement);
 	achievements[0]->type = ACHIEVEMENT_MISC;
+	achievements[0]->id_numeric = numericId++;
 	achievements[0]->identifier = "ACHIEVEMENT_MISC_PLAYTIME1";
 	achievements[0]->name = "Loyal player";
 	achievements[0]->description = "Spend 25 hours total on the server. You can check total time spent using /stats command. Reward: 20000 credits";
@@ -479,6 +483,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[0]->autoclaimable = qfalse;
 
 	achievements[1] = (dyd_achievement*)malloc(sizeof dyd_achievement);
+	achievements[1]->id_numeric = numericId++;
 	achievements[1]->type = ACHIEVEMENT_MISC;
 	achievements[1]->identifier = "ACHIEVEMENT_MISC_PLAYTIME2";
 	achievements[1]->name = "Follower";
