@@ -4,16 +4,6 @@
 
 #pragma warning (disable: 4996)
 
-void(*G_Knockdown)(gentity_t* victim, int duration) = (void(*)(gentity_t*, int))0x200ce8b0; //set ent->client->ps.velocity 1st
-void (*G_Damage2)(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, float *dir, float *point, int damage, int dflags, int mod) = (void(*)(gentity_t*, gentity_t*, gentity_t*, float*, float*, int, int, int))0x200C58E0;
-char* (*Accounts_Custom_GetValue)(Account_t* acc, const char *key) = (char*(*)(Account_t*, const char*))0x201712e0; //KEY/VALUE acc data read, data not existing = return NULL
-void(*Accounts_Custom_SetValue)(Account_t* acc, const char *key, const char *val) = (void(*)(Account_t*, const char*, const char*)) 0x20171350;//KEY/VALUE acc data write
-int(*ClientNumberFromString)(gentity_t* to, const char* s) = (int(*)(gentity_t*, const char*))0x200b5a10; //as name says
-gentity_t* (*GetEnt)(int index) = (gentity_t*(*)(int))0x20193150; //return entity struct for entity with proper index
-
-//int __cdecl Accounts_Stats_GetDeaths(Account_s *acc) ...
-
-
 plugininfo_t g_plugininfo = { "", "", "", "", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR };
 pluginres_t* g_result = NULL;
 eng_syscall_t g_syscall = NULL;
@@ -21,10 +11,74 @@ mod_vmMain_t g_vmMain = NULL;
 pluginfuncs_t* g_pluginfuncs = NULL;
 int g_vmbase = 0;
 
+void(*G_Knockdown)(gentity_t* victim, int duration) = (void(*)(gentity_t*, int))0x200ce8b0; //set ent->client->ps.velocity 1st
+void (*G_Damage2)(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, float *dir, float *point, int damage, int dflags, int mod) = (void(*)(gentity_t*, gentity_t*, gentity_t*, float*, float*, int, int, int))0x200C58E0;
+char* (*Accounts_Custom_GetValue)(Account_t* acc, const char *key) = (char*(*)(Account_t*, const char*))0x201712e0; //KEY/VALUE acc data read, data not existing = return NULL
+void(*Accounts_Custom_SetValue)(Account_t* acc, const char *key, const char *val) = (void(*)(Account_t*, const char*, const char*)) 0x20171350;//KEY/VALUE acc data write
+int(*ClientNumberFromString)(gentity_t* to, const char* s) = (int(*)(gentity_t*, const char*))0x200b5a10; //as name says
+gentity_t* (*GetEnt)(int index) = (gentity_t*(*)(int))0x20193150; //return entity struct for entity with proper index
+
+int(*Accounts_Stats_GetKills)(Account_t *acc) = (int(*)(Account_t*))0x20174F30;
+int(*Accounts_Stats_GetDeaths)(Account_t *acc) = (int(*)(Account_t*))0x20174DF0;
+int(*Accounts_Stats_GetDuels)(Account_t *acc) = (int(*)(Account_t*))0x20174E40;
+int(*Accounts_Stats_GetDuelsWon)(Account_t *acc) = (int(*)(Account_t*))0x20174E90;
+int(*Accounts_Stats_GetStashes)(Account_t *acc) = (int(*)(Account_t*))0x20174FD0;
+
+
 level_locals_t* g_level = (level_locals_t*)0x20ae90b8;
 
 struct dyd_achievement *achievements[32];
 int numericId = 1;
+
+__declspec(naked) void hook(unsigned int arg) //push arg
+{
+	__asm
+	{
+		ret
+	}
+}
+
+int Accounts_Stats_GetPlayerKills(Account_t *acc)
+{
+	if (acc)
+	{
+		char data[16];
+		sprintf(data, "%s", Accounts_Custom_GetValue(acc, "ACHIEVEMENT_TRACKDATA_PLAYERKILLS"));
+		return strtol(data, NULL, 0);
+	}
+	else return 0;
+}
+
+void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath)
+{
+	if (attacker && self != attacker && self->s.number < MAX_CLIENTS && attacker->s.number < MAX_CLIENTS)
+	{
+		if (attacker->client->pers.Lmd.account)
+		{
+			char kills[16];
+			sprintf(kills, "%s", Accounts_Custom_GetValue(attacker->client->pers.Lmd.account, "ACHIEVEMENT_TRACKDATA_PLAYERKILLS"));
+
+			int killnumber = strtol(kills, NULL, 0);
+			if (killnumber)
+			{
+				killnumber++;
+				sprintf(kills, "%d", killnumber);
+
+				Accounts_Custom_SetValue(attacker->client->pers.Lmd.account, "ACHIEVEMENT_TRACKDATA_PLAYERKILLS", kills);
+			}
+			else
+				Accounts_Custom_SetValue(attacker->client->pers.Lmd.account, "ACHIEVEMENT_TRACKDATA_PLAYERKILLS", "1");
+		}
+	}
+	__asm
+	{
+		mov esp, ebp
+		pop ebp
+		//add esp, 4 - would destroy return address
+	}
+
+	hook(0x200d15f0); //universal hook?
+}
 
 
 C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginres_t* presult, pluginfuncs_t* pluginfuncs, int iscmd)
