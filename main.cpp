@@ -60,25 +60,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 
 		//flavor commands
 
-		if (!stricmp(command, "dydtest")) //stricmp - POSIX caseless string compare
-		{
-			g_syscall(G_SEND_SERVER_COMMAND, -1, "cp \"Hello from ^0Dyd^1zio^2's plugin\n\"");
-			JASS_RET_SUPERCEDE(1);
-		}
-
-		if (!stricmp(command, "dyd_help"))
-		{
-			g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"Availble cmds:\n\"");
-			g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"dydtest\n\"");
-			g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"dyd_damage\n\"");
-			g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1dyd_shoot\n\"");
-			g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"dyd_redbull\n\"");
-			g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"dyd_slap\n\"");
-			g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"dyd_achievements\n\"");
-			JASS_RET_SUPERCEDE(1);
-		}
-
-		if (!stricmp(command, "dyd_slap"))
+		/*if (!stricmp(command, "slap"))
 		{
 			char buf[MAX_NETNAME];
 			int result;
@@ -92,61 +74,18 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 			if (result != -1)
 			{
 				gentity_t *victim = GetEnt(result);
-				victim->client->ps.velocity[1] = 250;
-				victim->client->ps.velocity[2] = 150;
-				victim->client->ps.velocity[3] = 50;
+				victim->client->ps.velocity[0] = 250;
+				victim->client->ps.velocity[1] = 150;
+				victim->client->ps.velocity[2] = 50;
 				G_Knockdown(victim, 500);
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "cp \"%s has been slapped!\n\", victim->client->pers.netname");
 			}
 			JASS_RET_SUPERCEDE(1);
-		}
-
-		if (!stricmp(command, "dyd_knockdown"))
-		{
-			char buf[16];
-			int time;
-			if (g_syscall(G_ARGC) < 2)
-			{
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3Usage: knockdown <time in ms>\n\"");
-				JASS_RET_SUPERCEDE(1);
-			}
-			g_syscall(G_ARGV, 1, buf, sizeof(buf));
-			time = strtol(buf, NULL, 0);
-			G_Knockdown(user, time);
-			g_syscall(G_SEND_SERVER_COMMAND, arg0, "chat \"Knockdown!\n\"");
-			JASS_RET_SUPERCEDE(1);
-		}
-
-		if (!stricmp(command, "dyd_damage"))
-		{
-			int damage;
-			char buf[16];
-
-			if (g_syscall(G_ARGC) < 2)
-			{
-				JASS_RET_SUPERCEDE(1);
-			}
-			g_syscall(G_ARGV, 1, buf, sizeof(buf));
-			damage = 2 * strtol(buf, NULL, 0);
-			G_Damage2(user, user, user, 0, 0, damage, 0, 0);
-			JASS_RET_SUPERCEDE(1);
-		}
-
-		if (!stricmp(command, "dyd_shoot"))
-		{
-			JASS_RET_SUPERCEDE(1);
-		}
-
-		if (!stricmp(command, "dyd_redbull"))
-		{
-			user->client->Lmd.customSpeed.time = g_level->time + 15000; // g_level->time - time since server start
-			user->client->Lmd.customSpeed.value = 350;
-			JASS_RET_SUPERCEDE(1);
-		}
+		}*/
 
 		//achievements
 
-		if (!stricmp(command, "dyd_achievements"))
+		if (!stricmp(command, "achievements"))
 		{
 			char arg[16];
 
@@ -158,11 +97,11 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 
 			if (g_syscall(G_ARGC) < 2)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3Usage: dyd_achievements <category> (ext) - list achievements in category, add word \'ext\' at the end to force more detailed description\n\"");
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3Usage: achievements <category> - list achievements in category\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^4Available categories:\nFight\nDuels\nMisc\nClaimable\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3dyd_achievements claim <ID> - claims achievement completion\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3dyd_achievements show <ID> - shows achievement description\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3dyd_achievements help - shows detailed description of achievement system\n\"");
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements claim <ID> - claims achievement completion\n\"");
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements show <ID> - shows achievement description\n\"");
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements help - shows detailed description of achievement system\n\"");
 				JASS_RET_SUPERCEDE(1);
 			}
 
@@ -230,11 +169,6 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				if (g_syscall(G_ARGC) > 2)
 				{
 					g_syscall(G_ARGV, 2, arg, sizeof(arg));
-
-					if (stricmp(arg, "ext")) //if NOT "ext"
-					{
-						g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^1Unknown modifier: %s\n\"", arg));
-					}
 				}
 
 				for (int i = 0; achievements[i] != NULL; i++)
@@ -252,7 +186,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 
 						if (!stricmp(arg, "ext"))
 						{
-							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^6 Description: %s\n\"", achievements[i]->description));
+							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i]->description));
 							achievements_progress(user, achievements[i]->identifier, qtrue);
 						}
 					}
@@ -265,7 +199,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^6Lugormod achievement system by ^0Dyd^1zio^6, version 0.1\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^5It allows two possible kinds of achievements: Claimable achievements, where player must force completion manually, and automatic achievements, where completion and reward are autogranted.\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^5Achievements are assigned to categories, what becomes helpful if number of achievements is large. Special category \'claimable\' shows claimable achievements from all other categories.\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3Possible syntax: achievements <category> (ext) - displays achievements from category. Optional word ^2ext^3 at the end forces detailed info for each achievement.\n\"");
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3Possible syntax: \nachievements <category> - displays achievements from category.\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements help - displays this help page \n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements show <ID> - displays detailed information about specific achievement\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements claim <ID> - use to complete claimable achievements.\n\"");
@@ -388,7 +322,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/25 hours - you finished the goal\n\"", hours));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/100 hours - you finished the goal\n\"", hours));
 			}
 			return 1;
 		}
@@ -458,7 +392,7 @@ void achievements_list(gentity_t *user, enum dyd_achievement_types type, qboolea
 
 			if (extended == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^6 Description: %s\n\"", achievements[i]->description));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i]->description));
 				achievements_progress(user, achievements[i]->identifier, qtrue);
 			}
 
