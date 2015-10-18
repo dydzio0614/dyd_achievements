@@ -360,7 +360,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 	if (!stricmp(x, "ACHIEVEMENT_MISC_PLAYTIME1"))
 	{
 		int time = user->client->pers.Lmd.account->time;
-		if (time >= 90000000)
+		if (time >= 90000)
 		{
 			if (print == qtrue)
 			{
@@ -381,7 +381,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 	else if (!stricmp(x, "ACHIEVEMENT_MISC_PLAYTIME2"))
 	{
 		int time = user->client->pers.Lmd.account->time;
-		if (time >= 360000000)
+		if (time >= 360000)
 		{
 			if (print == qtrue)
 			{
