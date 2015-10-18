@@ -3,7 +3,6 @@
 #include "achievements.h"
 
 #pragma warning (disable: 4996)
-#define DEKIEL NULL
 
 void(*G_Knockdown)(gentity_t* victim, int duration) = (void(*)(gentity_t*, int))0x200ce8b0; //set ent->client->ps.velocity 1st
 void (*G_Damage2)(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, float *dir, float *point, int damage, int dflags, int mod) = (void(*)(gentity_t*, gentity_t*, gentity_t*, float*, float*, int, int, int))0x200C58E0;
@@ -58,6 +57,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 
 		g_syscall(G_ARGV, 0, command, sizeof(command)); //getting cmd
 
+		//flavor commands
 
 		if (!stricmp(command, "dydtest")) //stricmp - POSIX caseless string compare
 		{
@@ -142,6 +142,8 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 			user->client->Lmd.customSpeed.value = 350;
 			JASS_RET_SUPERCEDE(1);
 		}
+
+		//achievements
 
 		if (!stricmp(command, "dyd_achievements"))
 		{
@@ -249,7 +251,8 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 
 						if (!stricmp(arg, "ext"))
 						{
-							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^3 Description: %s\n\"", achievements[i]->description));
+							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^6 Description: %s\n\"", achievements[i]->description));
+							achievements_progress(user, achievements[i]->identifier, qtrue);
 						}
 					}
 				}
@@ -286,7 +289,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 						{
 							if (achievements[i]->autoclaimable == qfalse)
 							{
-								achievements_check(user, achievements[i]->identifier);
+								achievements_check(user, achievements[i]);
 								JASS_RET_SUPERCEDE(1);
 							}
 							g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^7This achievement is not claimable! Its completion is granted automatically.\n\"");
@@ -314,6 +317,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 						if (!stricmp(achievements[i]->identifier, name))
 						{
 							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%s\n\"",achievements[i]->description)); 
+							achievements_progress(user, achievements[i]->identifier, qtrue);
 							JASS_RET_SUPERCEDE(1);
 						}
 					}
@@ -349,7 +353,6 @@ C_DLLEXPORT int JASS_syscall_Post(int cmd, int arg0, int arg1, int arg2, int arg
 {
 	JASS_RET_IGNORED(1);
 }
-
 
 
 int achievements_progress(gentity_t *user, const char *x, qboolean print) //check progress, can be used in unlock to check requirements, can be used to display progress
@@ -390,27 +393,27 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/25 hours\n\"", time / 3600000));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/100 hours\n\"", time / 3600000));
 			}
 			return 0;
 		}
 	}
 
-	else return -1;
+	else return -1; //achievement not found by identifier
 }
 
 
-void achievements_check(gentity_t *user, const char *x) //achievement unlock logic, TODO: check if adding credits to achievements struct will help with scalability
+void achievements_check(gentity_t *user, dyd_achievement *x) //achievement unlock logic, TODO: check if adding credits to achievements struct will help with scalability
 {
 	char arg[64]; // arg = x to uppercase
-	for (int i = 0; x[i] != NULL; i++)
+	for (int i = 0; x->identifier[i] != NULL; i++)
 	{
-		arg[i] = toupper(x[i]);
+		arg[i] = toupper(x->identifier[i]);
 	}
 
-	int state = achievements_progress(user, arg, qfalse);
+	int state = achievements_progress(user, arg, qtrue);
 
-	if (!stricmp(x, "ACHIEVEMENT_MISC_PLAYTIME1")) //play for 25 hours
+	if (state != -1)
 	{	
 		if (Accounts_Custom_GetValue(user->client->pers.Lmd.account, arg) == NULL)
 		{
@@ -418,26 +421,7 @@ void achievements_check(gentity_t *user, const char *x) //achievement unlock log
 			{
 				Accounts_Custom_SetValue(user->client->pers.Lmd.account, arg, "1");
 
-				user->client->pers.Lmd.account->credits += 20000;
-
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^2Achievement unlocked successfully!\n\"");
-			}
-			else
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^3You do not meet requirements to claim this achievement!\n\"");
-		}
-		else
-			g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^3This achievement is already completed!\n\"");
-
-	}
-	else if (!stricmp(x, "ACHIEVEMENT_MISC_PLAYTIME2")) //play for 100 hours
-	{
-		if (Accounts_Custom_GetValue(user->client->pers.Lmd.account, arg) == NULL)
-		{
-			if (state == 1)
-			{
-				Accounts_Custom_SetValue(user->client->pers.Lmd.account, arg, "1");
-				// TODO: check if function can be reduced to 1 case and put if-ed reward logic here
-				user->client->pers.Lmd.account->credits += 90000;
+				user->client->pers.Lmd.account->credits += x->reward_credits; //extend if new types of rewards added
 
 				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^2Achievement unlocked successfully!\n\"");
 			}
@@ -449,7 +433,7 @@ void achievements_check(gentity_t *user, const char *x) //achievement unlock log
 	}
 
 
-	else g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^1Internal error! No claiming mechanics for valid achievement\n\"");
+	else g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^1Internal error! No claiming mechanics for valid achievement\n\""); //achievement not found by identifier
 }
 
 
@@ -471,7 +455,8 @@ void achievements_list(gentity_t *user, enum dyd_achievement_types type, qboolea
 
 			if (extended == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3 Description: %s\n\"", achievements[i]->description));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^6 Description: %s\n\"", achievements[i]->description));
+				achievements_progress(user, achievements[i]->identifier, qtrue);
 			}
 
 			if (achievements[i]->autoclaimable == qfalse)
@@ -490,6 +475,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[0]->identifier = "ACHIEVEMENT_MISC_PLAYTIME1";
 	achievements[0]->name = "Loyal player";
 	achievements[0]->description = "Spend 25 hours total on the server. You can check total time spent using /stats command. Reward: 20000 credits";
+	achievements[0]->reward_credits = 20000;
 	achievements[0]->autoclaimable = qfalse;
 
 	achievements[1] = (dyd_achievement*)malloc(sizeof dyd_achievement);
@@ -497,5 +483,6 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[1]->identifier = "ACHIEVEMENT_MISC_PLAYTIME2";
 	achievements[1]->name = "Follower";
 	achievements[1]->description = "Spend 100 hours total on the server. You can check total time spent using /stats command. Reward: 90000 credits";
+	achievements[1]->reward_credits = 90000;
 	achievements[1]->autoclaimable = qfalse;
 }
