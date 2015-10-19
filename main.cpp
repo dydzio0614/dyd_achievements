@@ -1,3 +1,4 @@
+#include <Windows.h>
 #include "jassapi.h" 
 #include "jka_sdk/game/g_local.h"
 #include "achievements.h"
@@ -10,6 +11,8 @@ eng_syscall_t g_syscall = NULL;
 mod_vmMain_t g_vmMain = NULL;
 pluginfuncs_t* g_pluginfuncs = NULL;
 int g_vmbase = 0;
+
+#define PLAYER_DIE 0x200d15f0
 
 void(*G_Knockdown)(gentity_t* victim, int duration) = (void(*)(gentity_t*, int))0x200ce8b0; //set ent->client->ps.velocity 1st
 void (*G_Damage2)(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, float *dir, float *point, int damage, int dflags, int mod) = (void(*)(gentity_t*, gentity_t*, gentity_t*, float*, float*, int, int, int))0x200C58E0;
@@ -25,18 +28,44 @@ int(*Accounts_Stats_GetDuelsWon)(Account_t *acc) = (int(*)(Account_t*))0x20174E9
 int(*Accounts_Stats_GetStashes)(Account_t *acc) = (int(*)(Account_t*))0x20174FD0;
 
 
+
+void player_die(gentity_t*, gentity_t*, gentity_t*, int, int);
+
 level_locals_t* g_level = (level_locals_t*)0x20ae90b8;
 
 struct dyd_achievement *achievements[32];
 int numericId = 1;
 
-__declspec(naked) void hook(unsigned int arg) //push arg
+__declspec(naked) void execute_address(unsigned int arg) //push arg
 {
 	__asm
 	{
+		pop eax //destroy new return address
 		ret
 	}
 }
+
+__declspec(naked) void player_die_patchdata()
+{
+	__asm
+	{
+		push player_die
+		ret
+	}
+}
+
+__declspec(naked) void player_die_executeoriginal()
+{
+	__asm //original func data
+	{
+		push ebp
+		mov ebp, esp
+		sub esp, 192
+	}
+
+	execute_address(0x200d15f9);
+}
+
 
 int Accounts_Stats_GetPlayerKills(Account_t *acc)
 {
@@ -49,7 +78,7 @@ int Accounts_Stats_GetPlayerKills(Account_t *acc)
 	else return 0;
 }
 
-void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath)
+void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) //TODO: refactor the hook
 {
 	if (attacker && self != attacker && self->s.number < MAX_CLIENTS && attacker->s.number < MAX_CLIENTS)
 	{
@@ -74,18 +103,18 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	{
 		mov esp, ebp
 		pop ebp
-		//add esp, 4 - would destroy return address
 	}
 
-	hook(0x200d15f0); //universal hook?
+	execute_address((unsigned int)player_die_executeoriginal);
 }
 
 
 C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginres_t* presult, pluginfuncs_t* pluginfuncs, int iscmd)
 {
 	JASS_SAVE_VARS();
-
 	achievements_init();
+
+	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, player_die_patchdata, 6, NULL);
 
 	iscmd = 0;
 	return 1;
