@@ -96,6 +96,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 					if (!stricmp(achievements[i]->identifier, "A_FIGHT_PKILL1"))
 					{
 						attacker->client->pers.Lmd.account->credits += achievements[i]->reward_credits;
+						attacker->client->pers.Lmd.account->modifiedTime = g_level->time;
 						g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", attacker->client->pers.netname, achievements[i]->name));
 					}
 				}
@@ -109,6 +110,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 					if (!stricmp(achievements[i]->identifier, "A_FIGHT_PKILL2"))
 					{
 						attacker->client->pers.Lmd.account->credits += achievements[i]->reward_credits;
+						attacker->client->pers.Lmd.account->modifiedTime = g_level->time;
 						g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", attacker->client->pers.netname, achievements[i]->name));
 					}
 				}
@@ -122,6 +124,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 					if (!stricmp(achievements[i]->identifier, "A_FIGHT_PKILL3"))
 					{
 						attacker->client->pers.Lmd.account->credits += achievements[i]->reward_credits;
+						attacker->client->pers.Lmd.account->modifiedTime = g_level->time;
 						g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", attacker->client->pers.netname, achievements[i]->name));
 					}
 				}
@@ -549,6 +552,7 @@ void achievements_check(gentity_t *user, dyd_achievement *x) //achievement unloc
 				Accounts_Custom_SetValue(user->client->pers.Lmd.account, x->identifier, "1");
 
 				user->client->pers.Lmd.account->credits += x->reward_credits; //extend if new types of rewards added
+				user->client->pers.Lmd.account->modifiedTime = g_level->time; //ALWAYS modify this like that if doing direct changes to account fields
 
 				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^2Achievement unlocked successfully!\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", user->client->pers.netname, x->name));
