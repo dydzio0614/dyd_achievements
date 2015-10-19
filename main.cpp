@@ -2,10 +2,12 @@
 #include "jassapi.h" 
 #include "jka_sdk/game/g_local.h"
 #include "achievements.h"
+#include "hookdata.h"
 
 #pragma warning (disable: 4996)
 
-plugininfo_t g_plugininfo = { "", "", "", "", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR };
+//plugin info
+plugininfo_t g_plugininfo = { "dydplugin", "0.1.0", "Lugormod U# 2.4.8.3 Lugormod Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR };
 pluginres_t* g_result = NULL;
 eng_syscall_t g_syscall = NULL;
 mod_vmMain_t g_vmMain = NULL;
@@ -13,6 +15,9 @@ pluginfuncs_t* g_pluginfuncs = NULL;
 int g_vmbase = 0;
 
 #define PLAYER_DIE 0x200d15f0
+__declspec(naked) void player_die_patchdata();
+__declspec(naked) void player_die_entry();
+
 
 void(*G_Knockdown)(gentity_t* victim, int duration) = (void(*)(gentity_t*, int))0x200ce8b0; //set ent->client->ps.velocity 1st
 void (*G_Damage2)(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, float *dir, float *point, int damage, int dflags, int mod) = (void(*)(gentity_t*, gentity_t*, gentity_t*, float*, float*, int, int, int))0x200C58E0;
@@ -28,7 +33,6 @@ int(*Accounts_Stats_GetDuelsWon)(Account_t *acc) = (int(*)(Account_t*))0x20174E9
 int(*Accounts_Stats_GetStashes)(Account_t *acc) = (int(*)(Account_t*))0x20174FD0;
 
 
-
 void player_die(gentity_t*, gentity_t*, gentity_t*, int, int);
 
 level_locals_t* g_level = (level_locals_t*)0x20ae90b8;
@@ -36,34 +40,13 @@ level_locals_t* g_level = (level_locals_t*)0x20ae90b8;
 struct dyd_achievement *achievements[32];
 int numericId = 1;
 
-__declspec(naked) void execute_address(unsigned int arg) //push arg
+__declspec(naked) void execute_address(unsigned int arg) //push arg, naked function so does not disrupt ebp register flow
 {
 	__asm
 	{
 		pop eax //destroy new return address
 		ret
 	}
-}
-
-__declspec(naked) void player_die_patchdata()
-{
-	__asm
-	{
-		push player_die
-		ret
-	}
-}
-
-__declspec(naked) void player_die_executeoriginal()
-{
-	__asm //original func data
-	{
-		push ebp
-		mov ebp, esp
-		sub esp, 192
-	}
-
-	execute_address(0x200d15f9);
 }
 
 
@@ -88,6 +71,9 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 			sprintf(kills, "%s", Accounts_Custom_GetValue(attacker->client->pers.Lmd.account, "ACHIEVEMENT_TRACKDATA_PLAYERKILLS"));
 
 			int killnumber = strtol(kills, NULL, 0);
+
+			g_syscall(G_SEND_SERVER_COMMAND, -1, "chat \"^3brum brum\n\"");
+
 			if (killnumber)
 			{
 				killnumber++;
@@ -99,13 +85,14 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				Accounts_Custom_SetValue(attacker->client->pers.Lmd.account, "ACHIEVEMENT_TRACKDATA_PLAYERKILLS", "1");
 		}
 	}
+
 	__asm
 	{
 		mov esp, ebp
 		pop ebp
-	}
+	} //end function, but without returning to pre-call place
 
-	execute_address((unsigned int)player_die_executeoriginal);
+	execute_address((unsigned int)player_die_entry);
 }
 
 
@@ -122,6 +109,8 @@ C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginr
 
 C_DLLEXPORT void JASS_Detach(int iscmd)
 {
+	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, player_die_entry, 8, NULL);
+
 	iscmd = 0;
 }
 
