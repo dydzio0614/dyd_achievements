@@ -512,7 +512,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/4000 kills - you finished the goal\n\"", kills));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/5000 kills - you finished the goal\n\"", kills));
 			}
 			return 1;
 		}
@@ -520,7 +520,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/4000 kills\n\"", kills));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/5000 kills\n\"", kills));
 			}
 			return 0;
 		}
@@ -534,7 +534,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/9000 kills - you finished the goal\n\"", kills));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/10000 kills - you finished the goal\n\"", kills));
 			}
 			return 1;
 		}
@@ -542,7 +542,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/9000 kills\n\"", kills));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/10000 kills\n\"", kills));
 			}
 			return 0;
 		}
@@ -615,7 +615,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		}
 	}
 
-	else if (!stricmp(x, "A_DUELS_RATIO1"))
+	else if (!stricmp(x, "A_DUELS_DRATIO1"))
 	{
 		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
 		int wins = Accounts_Stats_GetDuelsWon(user->client->pers.Lmd.account);
@@ -639,7 +639,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		}
 	}
 
-	else if (!stricmp(x, "A_DUELS_RATIO2"))
+	else if (!stricmp(x, "A_DUELS_DRATIO2"))
 	{
 		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
 		int wins = Accounts_Stats_GetDuelsWon(user->client->pers.Lmd.account);
@@ -663,7 +663,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		}
 	}
 
-	else if (!stricmp(x, "A_DUELS_RATIO3"))
+	else if (!stricmp(x, "A_DUELS_DRATIO3"))
 	{
 		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
 		int wins = Accounts_Stats_GetDuelsWon(user->client->pers.Lmd.account);
