@@ -29,7 +29,7 @@ __declspec(naked) void player_die_entry()
 	{
 		push ebp
 		mov ebp, esp
-			sub esp, 192
+		sub esp, 192
 	}
 
 	execute_address(0x200d15f9); //original player_die + offset

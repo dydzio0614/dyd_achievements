@@ -42,6 +42,7 @@ level_locals_t* g_level = (level_locals_t*)0x20ae90b8;
 
 struct dyd_achievement *achievements[32];
 int numericId = 1;
+int dydmove_cooldown = 0;
 
 
 
@@ -195,6 +196,18 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 		g_syscall(G_ARGV, 0, command, sizeof(command)); //getting cmd
 
 		//flavor commands
+
+		//if (!stricmp(command, "dydmove") && acc && Accounts_Custom_GetValue(acc, "A_DUELS_ENGAGE3") != NULL) //for final version
+		if (!stricmp(command, "dydmove"))
+		{
+			if (g_level->time - dydmove_cooldown > 20000)
+			{
+				dydmove_cooldown = g_level->time;
+				user->client->ps.saberMove = 56; //change to proper one before release
+				user->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
+			}
+			JASS_RET_SUPERCEDE(1);
+		}
 
 		/*if (!stricmp(command, "slap"))
 		{
@@ -535,6 +548,145 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		}
 	}
 
+	else if (!stricmp(x, "A_DUELS_ENGAGE1"))
+	{
+		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
+
+		if (duels >= 500)
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/500 duels - you finished the goal\n\"", duels));
+			}
+			return 1;
+		}
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/500 duels\n\"", duels));
+			}
+			return 0;
+		}
+	}
+
+	else if (!stricmp(x, "A_DUELS_ENGAGE2"))
+	{
+		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
+
+		if (duels >= 1500)
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/1500 duels - you finished the goal\n\"", duels));
+			}
+			return 1;
+		}
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/1500 duels\n\"", duels));
+			}
+			return 0;
+		}
+	}
+
+	else if (!stricmp(x, "A_DUELS_ENGAGE3"))
+	{
+		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
+		int wins = Accounts_Stats_GetDuelsWon(user->client->pers.Lmd.account);
+
+		if (duels >= 3000 && wins >= 1500)
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/3000 duels, %d/1500 duel wins - you finished the goal\n\"", duels, wins));
+			}
+			return 1;
+		}
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/3000 duels, %d/1500 duel wins\n\"", duels, wins));
+			}
+			return 0;
+		}
+	}
+
+	else if (!stricmp(x, "A_DUELS_RATIO1"))
+	{
+		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
+		int wins = Accounts_Stats_GetDuelsWon(user->client->pers.Lmd.account);
+		float ratio = (float)wins / (float)(duels - wins);
+
+		if (duels >= 500 && ratio >= 1.0)
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/500 duels, %.2f duel ratio (1.0 needed) - you finished the goal\n\"", duels, ratio));
+			}
+			return 1;
+		}
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/500 duels, %.2f duel ratio (1.0 needed)\n\"", duels, ratio));
+			}
+			return 0;
+		}
+	}
+
+	else if (!stricmp(x, "A_DUELS_RATIO2"))
+	{
+		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
+		int wins = Accounts_Stats_GetDuelsWon(user->client->pers.Lmd.account);
+		float ratio = (float)wins / (float)(duels - wins);
+
+		if (duels >= 1250 && ratio >= 1.5)
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/1250 duels, %.2f duel ratio (1.5 needed) - you finished the goal\n\"", duels, ratio));
+			}
+			return 1;
+		}
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/1250 duels, %.2f duel ratio (1.5 needed)\n\"", duels, ratio));
+			}
+			return 0;
+		}
+	}
+
+	else if (!stricmp(x, "A_DUELS_RATIO3"))
+	{
+		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
+		int wins = Accounts_Stats_GetDuelsWon(user->client->pers.Lmd.account);
+		float ratio = (float)wins / (float)(duels - wins);
+
+		if (duels >= 2500 && ratio >= 2.0)
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/2500 duels, %.2f duel ratio (2.0 needed) - you finished the goal\n\"", duels, ratio));
+			}
+			return 1;
+		}
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/2500 duels, %.2f duel ratio (2.0 needed)\n\"", duels, ratio));
+			}
+			return 0;
+		}
+	}
+
 	else return -1; //achievement not found by identifier
 }
 
@@ -552,7 +704,7 @@ void achievements_check(gentity_t *user, dyd_achievement *x) //achievement unloc
 				Accounts_Custom_SetValue(user->client->pers.Lmd.account, x->identifier, "1");
 
 				user->client->pers.Lmd.account->credits += x->reward_credits; //extend if new types of rewards added
-				user->client->pers.Lmd.account->modifiedTime = g_level->time; //ALWAYS modify this like that if doing direct changes to account fields
+				user->client->pers.Lmd.account->modifiedTime = g_level->time; //ALWAYS modify this field like that if doing direct changes to account fields
 
 				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^2Achievement unlocked successfully!\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", user->client->pers.netname, x->name));
@@ -639,7 +791,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[3]->id_numeric = numericId++;
 	achievements[3]->identifier = "A_FIGHT_PKILL2";
 	achievements[3]->name = "Battlemaster";
-	achievements[3]->description = "Kill 4000 players. Reward: 100000 credits";
+	achievements[3]->description = "Kill 5000 players. Reward: 100000 credits";
 	achievements[3]->reward_credits = 100000;
 	achievements[3]->autoclaimable = qtrue;
 
@@ -648,8 +800,61 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[4]->id_numeric = numericId++;
 	achievements[4]->identifier = "A_FIGHT_PKILL3";
 	achievements[4]->name = "Conqueror";
-	achievements[4]->description = "Kill 9000 players. Reward: 160000 credits";
+	achievements[4]->description = "Kill 10000 players. Reward: 160000 credits";
 	achievements[4]->reward_credits = 160000;
 	achievements[4]->autoclaimable = qtrue;
 
+	achievements[5] = (dyd_achievement*)malloc(sizeof dyd_achievement);
+	achievements[5]->type = ACHIEVEMENT_DUELS;
+	achievements[5]->id_numeric = numericId++;
+	achievements[5]->identifier = "A_DUELS_ENGAGE1";
+	achievements[5]->name = "Saberfighter";
+	achievements[5]->description = "Play 500 saber duels. Reward: 25000 credits.";
+	achievements[5]->reward_credits = 25000;
+	achievements[5]->autoclaimable = qfalse;
+
+	achievements[6] = (dyd_achievement*)malloc(sizeof dyd_achievement);
+	achievements[6]->type = ACHIEVEMENT_DUELS;
+	achievements[6]->id_numeric = numericId++;
+	achievements[6]->identifier = "A_DUELS_ENGAGE2";
+	achievements[6]->name = "Saber fan";
+	achievements[6]->description = "Play 1500 saber duels. Reward: 60000 cr.";
+	achievements[6]->reward_credits = 60000;
+	achievements[6]->autoclaimable = qfalse;
+
+	achievements[7] = (dyd_achievement*)malloc(sizeof dyd_achievement);
+	achievements[7]->type = ACHIEVEMENT_DUELS;
+	achievements[7]->id_numeric = numericId++;
+	achievements[7]->identifier = "A_DUELS_ENGAGE3";
+	achievements[7]->name = "Saber freak";
+	achievements[7]->description = "Play 3000 saber duels and win at least 1500 duels total. Reward: 100000 cr. You are allowed to perform dual saber kata hit under any condition with 20 seconds cooldown";
+	achievements[7]->reward_credits = 100000;
+	achievements[7]->autoclaimable = qfalse;
+
+	achievements[8] = (dyd_achievement*)malloc(sizeof dyd_achievement);
+	achievements[8]->type = ACHIEVEMENT_DUELS;
+	achievements[8]->id_numeric = numericId++;
+	achievements[8]->identifier = "A_DUELS_DRATIO1";
+	achievements[8]->name = "Aspiring saberist";
+	achievements[8]->description = "Play 500 saber duels. Win at least half of duels you played. Reward: 35000 credits.";
+	achievements[8]->reward_credits = 35000;
+	achievements[8]->autoclaimable = qfalse;
+
+	achievements[8] = (dyd_achievement*)malloc(sizeof dyd_achievement);
+	achievements[8]->type = ACHIEVEMENT_DUELS;
+	achievements[8]->id_numeric = numericId++;
+	achievements[8]->identifier = "A_DUELS_DRATIO2";
+	achievements[8]->name = "Competitive saberist";
+	achievements[8]->description = "Play 1250 saber duels. Have at least 1.5x more wins than defeats on duels you played. Reward: 80000 credits.";
+	achievements[8]->reward_credits = 85000;
+	achievements[8]->autoclaimable = qfalse;
+
+	achievements[8] = (dyd_achievement*)malloc(sizeof dyd_achievement);
+	achievements[8]->type = ACHIEVEMENT_DUELS;
+	achievements[8]->id_numeric = numericId++;
+	achievements[8]->identifier = "A_DUELS_DRATIO3";
+	achievements[8]->name = "Duel master";
+	achievements[8]->description = "Play 2500 saber duels. Have at least 2x more wins than defeats on duels you played. Reward: 250000 credits.";
+	achievements[8]->reward_credits = 225000;
+	achievements[8]->autoclaimable = qfalse;
 }
