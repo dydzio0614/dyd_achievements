@@ -19,10 +19,32 @@ struct dyd_achievement
 	qboolean autoclaimable;
 };
 
+struct dyd_achievement *achievements[32];
+
 void achievements_init();
 void achievements_check(gentity_t*, dyd_achievement*);
 void achievements_list(gentity_t*, enum dyd_achievement_types, qboolean);
 int achievements_progress(gentity_t*, const char*, qboolean);
+
+dyd_achievement* FindAchievementById(int value)
+{
+	for (int i = 0; achievements[i] != NULL; i++)
+	{
+		if (achievements[i]->id_numeric == value)
+			return achievements[i];
+	}
+	return NULL;
+}
+
+dyd_achievement* FindAchievementByTextIdentifier(const char *text)
+{
+	for (int i = 0; achievements[i] != NULL; i++)
+	{
+		if (!stricmp(text, achievements[i]->identifier))
+			return achievements[i];
+	}
+	return NULL;
+}
 
 #endif //__DYD_ACHIEVEMENTS__
 

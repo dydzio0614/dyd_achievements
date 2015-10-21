@@ -40,17 +40,16 @@ void player_die(gentity_t*, gentity_t*, gentity_t*, int, int);
 //global data
 level_locals_t* g_level = (level_locals_t*)0x20ae90b8;
 
-struct dyd_achievement *achievements[32];
-int numericId = 1;
-int dydmove_cooldown = 0;
 
+int numericId = 1;
+//int dydmove_cooldown = 0;
 
 
 int Accounts_Stats_GetPlayerKills(Account_t *acc)
 {
 	if (acc)
 	{
-		char data[16];
+		char data[32];
 		sprintf(data, "%s", Accounts_Custom_GetValue(acc, "A_DATA_PLAYERKILLS"));
 		return strtol(data, NULL, 0);
 	}
@@ -61,11 +60,31 @@ int Accounts_Stats_GetPlayerDefeats(Account_t *acc)
 {
 	if (acc)
 	{
-		char data[16];
+		char data[32];
 		sprintf(data, "%s", Accounts_Custom_GetValue(acc, "A_DATA_PLAYERDEATHS"));
 		return strtol(data, NULL, 0);
 	}
 	else return 0;
+}
+
+void Accounts_Stats_SetPlayerKills(Account_t *acc, int value)
+{
+	if (acc)
+	{
+		char data[32];
+		sprintf(data, "%d", value);
+		Accounts_Custom_SetValue(acc, "A_DATA_PLAYERKILLS", data);
+	}
+}
+
+void Accounts_Stats_SetPlayerDefeats(Account_t *acc, int value)
+{
+	if (acc)
+	{
+		char data[32];
+		sprintf(data, "%d", value);
+		Accounts_Custom_SetValue(acc, "A_DATA_PLAYERDEATHS", data);
+	}
 }
 
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath)
@@ -73,81 +92,57 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	if (attacker && self != attacker && self->s.number < MAX_CLIENTS && attacker->s.number < MAX_CLIENTS)
 	{
 		if (attacker->client->pers.Lmd.account)
-		{
-			char kills[16];
-			sprintf(kills, "%s", Accounts_Custom_GetValue(attacker->client->pers.Lmd.account, "A_DATA_PLAYERKILLS"));
-
-			int killnumber = strtol(kills, NULL, 0);
+		{   //update playerkills
+			int killnumber = Accounts_Stats_GetPlayerKills(attacker->client->pers.Lmd.account);
 
 			if (killnumber)
 			{
 				killnumber++;
-				sprintf(kills, "%d", killnumber);
-
-				Accounts_Custom_SetValue(attacker->client->pers.Lmd.account, "A_DATA_PLAYERKILLS", kills);
+				Accounts_Stats_SetPlayerKills(attacker->client->pers.Lmd.account, killnumber);
 			}
 			else
-				Accounts_Custom_SetValue(attacker->client->pers.Lmd.account, "A_DATA_PLAYERKILLS", "1");
+				Accounts_Stats_SetPlayerKills(attacker->client->pers.Lmd.account, 1);
 
-			if (killnumber >= 1000 && Accounts_Custom_GetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL1") == NULL)
+			//achievement checks
+			if (achievements_progress(attacker, "A_FIGHT_PKILL1", qfalse) == 1 && Accounts_Custom_GetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL1") == NULL)
 			{
 				Accounts_Custom_SetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL1", "1");
-				for (int i = 0; achievements[i] != NULL; i++)
-				{
-					if (!stricmp(achievements[i]->identifier, "A_FIGHT_PKILL1"))
-					{
-						attacker->client->pers.Lmd.account->credits += achievements[i]->reward_credits;
-						attacker->client->pers.Lmd.account->modifiedTime = g_level->time;
-						g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", attacker->client->pers.netname, achievements[i]->name));
-					}
-				}
+				dyd_achievement *x = FindAchievementByTextIdentifier("A_FIGHT_PKILL1");
+				attacker->client->pers.Lmd.account->credits += x->reward_credits; //maybe further refactor using achievements_claim?
+				attacker->client->pers.Lmd.account->modifiedTime = g_level->time;
+				g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", attacker->client->pers.netname, x->name));
 			}
 
-			if (killnumber >= 4000 && Accounts_Custom_GetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL2") == NULL)
+			if (achievements_progress(attacker, "A_FIGHT_PKILL2", qfalse) == 1 && Accounts_Custom_GetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL2") == NULL)
 			{
 				Accounts_Custom_SetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL2", "1");
-				for (int i = 0; achievements[i] != NULL; i++)
-				{
-					if (!stricmp(achievements[i]->identifier, "A_FIGHT_PKILL2"))
-					{
-						attacker->client->pers.Lmd.account->credits += achievements[i]->reward_credits;
-						attacker->client->pers.Lmd.account->modifiedTime = g_level->time;
-						g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", attacker->client->pers.netname, achievements[i]->name));
-					}
-				}
+				dyd_achievement *x = FindAchievementByTextIdentifier("A_FIGHT_PKILL2");
+				attacker->client->pers.Lmd.account->credits += x->reward_credits;
+				attacker->client->pers.Lmd.account->modifiedTime = g_level->time;
+				g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", attacker->client->pers.netname, x->name));
 			}
 
-			if (killnumber >= 9000 && Accounts_Custom_GetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL3") == NULL)
+			if (achievements_progress(attacker, "A_FIGHT_PKILL3", qfalse) == 1 && Accounts_Custom_GetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL3") == NULL)
 			{
 				Accounts_Custom_SetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL3", "1");
-				for (int i = 0; achievements[i] != NULL; i++)
-				{
-					if (!stricmp(achievements[i]->identifier, "A_FIGHT_PKILL3"))
-					{
-						attacker->client->pers.Lmd.account->credits += achievements[i]->reward_credits;
-						attacker->client->pers.Lmd.account->modifiedTime = g_level->time;
-						g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", attacker->client->pers.netname, achievements[i]->name));
-					}
-				}
+				dyd_achievement *x = FindAchievementByTextIdentifier("A_FIGHT_PKILL3");
+				attacker->client->pers.Lmd.account->credits += x->reward_credits;
+				attacker->client->pers.Lmd.account->modifiedTime = g_level->time;
+				g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", attacker->client->pers.netname, x->name));
 			}
 		}
 
 		if (self->client->pers.Lmd.account)
-		{
-			char deaths[16];
-			sprintf(deaths, "%s", Accounts_Custom_GetValue(self->client->pers.Lmd.account, "A_DATA_PLAYERDEATHS"));
-
-			int deathnumber = strtol(deaths, NULL, 0);
+		{	//update playerdeaths
+			int deathnumber = Accounts_Stats_GetPlayerDefeats(attacker->client->pers.Lmd.account);
 
 			if (deathnumber)
 			{
 				deathnumber++;
-				sprintf(deaths, "%d", deathnumber);
-
-				Accounts_Custom_SetValue(self->client->pers.Lmd.account, "A_DATA_PLAYERDEATHS", deaths);
+				Accounts_Stats_SetPlayerDefeats(attacker->client->pers.Lmd.account, deathnumber);
 			}
 			else
-				Accounts_Custom_SetValue(self->client->pers.Lmd.account, "A_DATA_PLAYERDEATHS", "1");
+				Accounts_Stats_SetPlayerDefeats(attacker->client->pers.Lmd.account, 1);
 		}
 	}
 
@@ -176,6 +171,11 @@ C_DLLEXPORT void JASS_Detach(int iscmd)
 {
 	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, player_die_entry, 8, NULL);
 
+	for (int i = 0; achievements[i] != NULL; i++)
+	{
+		free(achievements[i]);
+	}
+
 	iscmd = 0;
 }
 
@@ -198,7 +198,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 		//flavor commands
 
 		//if (!stricmp(command, "dydmove") && acc && Accounts_Custom_GetValue(acc, "A_DUELS_ENGAGE3") != NULL) //for final version
-		if (!stricmp(command, "dydmove"))
+		/*if (!stricmp(command, "dydmove"))
 		{
 			if (g_level->time - dydmove_cooldown > 20000)
 			{
@@ -207,7 +207,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				user->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
 			}
 			JASS_RET_SUPERCEDE(1);
-		}
+		}*/
 
 		/*if (!stricmp(command, "slap"))
 		{
@@ -393,15 +393,15 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				else
 				{
 					g_syscall(G_ARGV, 2, id, sizeof(id));
-					for (int i = 0; achievements[i] != NULL; i++)
+
+					dyd_achievement *x = FindAchievementById(strtol(id, NULL, 0));
+					if (x != NULL)
 					{
-						if (achievements[i]->id_numeric == strtol(id, NULL, 0))
-						{
-							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%s\n^6%s\n\"", achievements[i]->name, achievements[i]->description)); 
-							achievements_progress(user, achievements[i]->identifier, qtrue);
-							JASS_RET_SUPERCEDE(1);
-						}
+						g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%s\n^6%s\n\"", x->name, x->description));
+						achievements_progress(user, x->identifier, qtrue);
+						JASS_RET_SUPERCEDE(1);
 					}
+
 					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^5Achievement not found!\n\"");
 				}
 				JASS_RET_SUPERCEDE(1);
@@ -508,7 +508,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 	{
 		int kills = Accounts_Stats_GetPlayerKills(user->client->pers.Lmd.account); //seconds
 		//int deaths = Accounts_Stats_GetPlayerDefeats(user->client->pers.Lmd.account); //in case we want to show kill / death ratio
-		if (kills >= 4000)
+		if (kills >= 5000)
 		{
 			if (print == qtrue)
 			{
@@ -530,7 +530,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 	{
 		int kills = Accounts_Stats_GetPlayerKills(user->client->pers.Lmd.account); //seconds
 		//int deaths = Accounts_Stats_GetPlayerDefeats(user->client->pers.Lmd.account); //in case we want to show kill / death ratio
-		if (kills >= 9000)
+		if (kills >= 10000)
 		{
 			if (print == qtrue)
 			{
