@@ -35,5 +35,4 @@ __declspec(naked) void player_die_entry()
 	execute_address(0x200d15f9); //original player_die + offset
 }
 
-
 #endif //__DYD_HOOK__

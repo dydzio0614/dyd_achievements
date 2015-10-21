@@ -305,6 +305,24 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				JASS_RET_SUPERCEDE(1);
 			}
 
+			else if (!stricmp(arg, "serverhelper"))
+			{
+				char arg[16];
+				if (g_syscall(G_ARGC) > 2)
+				{
+					g_syscall(G_ARGV, 2, arg, sizeof(arg));
+					if (!stricmp(arg, "ext"))
+					{
+						achievements_list(user, ACHIEVEMENT_DUELS, qtrue);
+						JASS_RET_SUPERCEDE(1);
+					}
+				}
+
+				achievements_list(user, ACHIEVEMENT_HELPER, qfalse);
+
+				JASS_RET_SUPERCEDE(1);
+			}
+
 			else if (!stricmp(arg, "claimable")) //logic separated from achievements_list() but similar
 			{
 				if (g_syscall(G_ARGC) > 2)
@@ -852,4 +870,20 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[10].reward_credits = 250000;
 	sprintf(achievements[10].description, "Play 2500 saber duels. Have at least 2x more wins than defeats on duels you played. Reward: %d credits.", achievements[10].reward_credits);
 	achievements[10].autoclaimable = qfalse;
+
+	achievements[11].type = ACHIEVEMENT_NONE;
+	achievements[11].id_numeric = 1337;
+	achievements[11].identifier = "A_NONE_RAGEDYDZIO";
+	achievements[11].name = "Trolled by own system user";
+	achievements[11].reward_credits = -10000;
+	sprintf(achievements[11].description, "Make ^0Dyd^1zio^6 ragequit. Reward: ^1%d^6 credits.", achievements[10].reward_credits);
+	achievements[11].autoclaimable = qtrue;
+
+	achievements[12].type = ACHIEVEMENT_HELPER;
+	achievements[12].id_numeric = numericId++;
+	achievements[12].identifier = "A_HELPER_DONATOR";
+	achievements[12].name = "Wallet warrior";
+	achievements[12].reward_credits = 300000;
+	sprintf(achievements[12].description, "Donate at least $5 to help the server stay. That allows you to get one-time special reward on one of your accounts. Reward: %d credits.", achievements[10].reward_credits);
+	achievements[12].autoclaimable = qtrue;
 }

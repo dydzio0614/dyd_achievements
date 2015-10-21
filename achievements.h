@@ -1,13 +1,15 @@
 #ifndef __DYD_ACHIEVEMENTS__
 #define __DYD_ACHIEVEMENTS__
 
-#define MAX_ACHIEVEMENTS 11
+#define MAX_ACHIEVEMENTS 13
 
 enum dyd_achievement_types
 {
+	ACHIEVEMENT_NONE,
 	ACHIEVEMENT_FIGHT,
 	ACHIEVEMENT_DUELS,
-	ACHIEVEMENT_MISC
+	ACHIEVEMENT_MISC,
+	ACHIEVEMENT_HELPER
 };
 
 struct dyd_achievement
@@ -51,6 +53,4 @@ dyd_achievement* FindAchievementByTextIdentifier(const char *text)
 	return NULL;
 }
 
-
 #endif //__DYD_ACHIEVEMENTS__
-
