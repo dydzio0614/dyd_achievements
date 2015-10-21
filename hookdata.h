@@ -14,8 +14,6 @@ __declspec(naked) void execute_address(unsigned int arg) //push arg, naked funct
 
 //PLAYER_DIE
 
-#define PLAYER_DIE 0x200d15f0
-
 __declspec(naked) void player_die_patchdata()
 {
 	__asm
