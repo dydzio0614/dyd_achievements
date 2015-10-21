@@ -601,7 +601,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/3000 duels, %d/1500 duel wins - you finished the goal\n\"", duels, wins));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/3000 duels, %d/1500 duels won - you finished the goal\n\"", duels, wins));
 			}
 			return 1;
 		}
@@ -609,7 +609,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/3000 duels, %d/1500 duel wins\n\"", duels, wins));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/3000 duels, %d/1500 duels won\n\"", duels, wins));
 			}
 			return 0;
 		}
@@ -840,21 +840,21 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[8]->reward_credits = 35000;
 	achievements[8]->autoclaimable = qfalse;
 
-	achievements[8] = (dyd_achievement*)malloc(sizeof dyd_achievement);
-	achievements[8]->type = ACHIEVEMENT_DUELS;
-	achievements[8]->id_numeric = numericId++;
-	achievements[8]->identifier = "A_DUELS_DRATIO2";
-	achievements[8]->name = "Competitive saberist";
-	achievements[8]->description = "Play 1250 saber duels. Have at least 1.5x more wins than defeats on duels you played. Reward: 80000 credits.";
-	achievements[8]->reward_credits = 85000;
-	achievements[8]->autoclaimable = qfalse;
+	achievements[9] = (dyd_achievement*)malloc(sizeof dyd_achievement);
+	achievements[9]->type = ACHIEVEMENT_DUELS;
+	achievements[9]->id_numeric = numericId++;
+	achievements[9]->identifier = "A_DUELS_DRATIO2";
+	achievements[9]->name = "Competitive saberist";
+	achievements[9]->description = "Play 1250 saber duels. Have at least 1.5x more wins than defeats on duels you played. Reward: 80000 credits.";
+	achievements[9]->reward_credits = 85000;
+	achievements[9]->autoclaimable = qfalse;
 
-	achievements[8] = (dyd_achievement*)malloc(sizeof dyd_achievement);
-	achievements[8]->type = ACHIEVEMENT_DUELS;
-	achievements[8]->id_numeric = numericId++;
-	achievements[8]->identifier = "A_DUELS_DRATIO3";
-	achievements[8]->name = "Duel master";
-	achievements[8]->description = "Play 2500 saber duels. Have at least 2x more wins than defeats on duels you played. Reward: 250000 credits.";
-	achievements[8]->reward_credits = 225000;
-	achievements[8]->autoclaimable = qfalse;
+	achievements[10] = (dyd_achievement*)malloc(sizeof dyd_achievement);
+	achievements[10]->type = ACHIEVEMENT_DUELS;
+	achievements[10]->id_numeric = numericId++;
+	achievements[10]->identifier = "A_DUELS_DRATIO3";
+	achievements[10]->name = "Duel master";
+	achievements[10]->description = "Play 2500 saber duels. Have at least 2x more wins than defeats on duels you played. Reward: 250000 credits.";
+	achievements[10]->reward_credits = 225000;
+	achievements[10]->autoclaimable = qfalse;
 }

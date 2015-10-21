@@ -26,6 +26,7 @@ void achievements_check(gentity_t*, dyd_achievement*);
 void achievements_list(gentity_t*, enum dyd_achievement_types, qboolean);
 int achievements_progress(gentity_t*, const char*, qboolean);
 
+//utility functions
 dyd_achievement* FindAchievementById(int value)
 {
 	for (int i = 0; achievements[i] != NULL; i++)
