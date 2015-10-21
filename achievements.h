@@ -1,6 +1,8 @@
 #ifndef __DYD_ACHIEVEMENTS__
 #define __DYD_ACHIEVEMENTS__
 
+#define MAX_ACHIEVEMENTS 11
+
 enum dyd_achievement_types
 {
 	ACHIEVEMENT_FIGHT,
@@ -14,12 +16,12 @@ struct dyd_achievement
 	int id_numeric; //main achievement ID
 	char* identifier; //unique name for preserving in lugormod account data
 	char* name; //name to display
-	char* description; //description to display in console
+	char description[256]; //description to display in console
 	int reward_credits;
 	qboolean autoclaimable;
 };
 
-struct dyd_achievement *achievements[32]; //TODO: alloc achievements on stack
+struct dyd_achievement achievements[MAX_ACHIEVEMENTS];
 
 
 //headers of functions defined in main:
@@ -31,20 +33,20 @@ int achievements_progress(gentity_t*, const char*, qboolean);
 //utility functions
 dyd_achievement* FindAchievementById(int value)
 {
-	for (int i = 0; achievements[i] != NULL; i++)
+	for (int i = 0; i < MAX_ACHIEVEMENTS; i++)
 	{
-		if (achievements[i]->id_numeric == value)
-			return achievements[i];
+		if (achievements[i].id_numeric == value)
+			return &achievements[i];
 	}
 	return NULL;
 }
 
 dyd_achievement* FindAchievementByTextIdentifier(const char *text)
 {
-	for (int i = 0; achievements[i] != NULL; i++)
+	for (int i = 0; i < MAX_ACHIEVEMENTS; i++)
 	{
-		if (!stricmp(text, achievements[i]->identifier))
-			return achievements[i];
+		if (!stricmp(text, achievements[i].identifier))
+			return &achievements[i];
 	}
 	return NULL;
 }
