@@ -81,6 +81,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="achievements.h" />
+    <ClInclude Include="dydutils.h" />
+    <ClInclude Include="functionhooks.h" />
     <ClInclude Include="hookdata.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
