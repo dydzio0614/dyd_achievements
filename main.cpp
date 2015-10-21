@@ -30,11 +30,6 @@ C_DLLEXPORT void JASS_Detach(int iscmd)
 {
 	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, player_die_entry, 8, NULL);
 
-	for (int i = 0; achievements[i] != NULL; i++)
-	{
-		free(achievements[i]);
-	}
-
 	iscmd = 0;
 }
 
@@ -176,23 +171,23 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					g_syscall(G_ARGV, 2, arg, sizeof(arg));
 				}
 
-				for (int i = 0; achievements[i] != NULL; i++)
+				for (int i = 0; i < ACHIEV_COUNT; i++)
 				{
-					if (achievements[i]->autoclaimable == qfalse)
+					if (achievements[i].autoclaimable == qfalse)
 					{
-						if (Accounts_Custom_GetValue(user->client->pers.Lmd.account, achievements[i]->identifier) == NULL)
+						if (Accounts_Custom_GetValue(user->client->pers.Lmd.account, achievements[i].identifier) == NULL)
 						{
-							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^3%d. %s\n\"", achievements[i]->id_numeric, achievements[i]->name));
+							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^3%d. %s\n\"", achievements[i].id_numeric, achievements[i].name));
 						}
 						else
 						{
-							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%d. %s - COMPLETED\n\"", achievements[i]->id_numeric, achievements[i]->name));
+							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%d. %s - COMPLETED\n\"", achievements[i].id_numeric, achievements[i].name));
 						}
 
 						if (!stricmp(arg, "ext"))
 						{
-							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i]->description));
-							achievements_progress(user, achievements[i]->identifier, qtrue);
+							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i].description));
+							achievements_progress(user, achievements[i].identifier, qtrue);
 						}
 					}
 				}
@@ -223,13 +218,13 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				else
 				{
 					g_syscall(G_ARGV, 2, id, sizeof(id));
-					for (int i = 0; achievements[i] != NULL; i++)
+					for (int i = 0; i < ACHIEV_COUNT; i++)
 					{
-						if (achievements[i]->id_numeric == strtol(id, NULL, 0))
+						if (achievements[i].id_numeric == strtol(id, NULL, 0))
 						{
-							if (achievements[i]->autoclaimable == qfalse)
+							if (achievements[i].autoclaimable == qfalse)
 							{
-								achievements_check(user, achievements[i]);
+								achievements_check(user, &achievements[i]);
 								JASS_RET_SUPERCEDE(1);
 							}
 							g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^7This achievement is not claimable! Its completion is granted automatically.\n\"");
