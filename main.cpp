@@ -42,7 +42,7 @@ level_locals_t* g_level = (level_locals_t*)0x20ae90b8;
 
 
 int numericId = 1;
-//int dydmove_cooldown = 0;
+int dydmove_cooldown = 0;
 
 
 int Accounts_Stats_GetPlayerKills(Account_t *acc)
@@ -193,16 +193,19 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 		//flavor commands
 
 		//if (!stricmp(command, "dydmove") && acc && Accounts_Custom_GetValue(acc, "A_DUELS_ENGAGE3") != NULL) //for final version
-		/*if (!stricmp(command, "dydmove"))
+		if (!stricmp(command, "dydmove"))
 		{
 			if (g_level->time - dydmove_cooldown > 20000)
 			{
 				dydmove_cooldown = g_level->time;
-				user->client->ps.saberMove = 56; //change to proper one before release
+				user->client->ps.saberMove = 50; //change to proper one before release
 				user->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
 			}
+			else
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You have to wait before using this skill again.\n\"");
+
 			JASS_RET_SUPERCEDE(1);
-		}*/
+		}
 
 		/*if (!stricmp(command, "slap"))
 		{
@@ -242,7 +245,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 			if (g_syscall(G_ARGC) < 2)
 			{
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3Usage: achievements <category> - list achievements in category\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^4Available categories:\nFight\nDuels\nMisc\nClaimable\n\"");
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^5Available categories:\nFight\nDuels\nMisc\nClaimable\nServerhelper\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements claim <ID> - claims achievement completion\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements show <ID> - shows achievement description\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements help - shows detailed description of achievement system\n\"");
@@ -876,7 +879,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[11].identifier = "A_NONE_RAGEDYDZIO";
 	achievements[11].name = "Trolled by own system user";
 	achievements[11].reward_credits = -10000;
-	sprintf(achievements[11].description, "Make ^0Dyd^1zio^6 ragequit. Reward: ^1%d^6 credits.", achievements[10].reward_credits);
+	sprintf(achievements[11].description, "Make ^0Dyd^1zio^6 ragequit. Reward: ^1%d^6 credits.", achievements[11].reward_credits);
 	achievements[11].autoclaimable = qtrue;
 
 	achievements[12].type = ACHIEVEMENT_HELPER;
@@ -884,6 +887,6 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[12].identifier = "A_HELPER_DONATOR";
 	achievements[12].name = "Wallet warrior";
 	achievements[12].reward_credits = 300000;
-	sprintf(achievements[12].description, "Donate at least $5 to help the server stay. That allows you to get one-time special reward on one of your accounts. Reward: %d credits.", achievements[10].reward_credits);
+	sprintf(achievements[12].description, "Donate at least $5 to help the server stay. That allows you to get one-time special reward on one of your accounts. Reward: %d credits.", achievements[12].reward_credits);
 	achievements[12].autoclaimable = qtrue;
 }
