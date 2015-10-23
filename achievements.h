@@ -1,7 +1,7 @@
 #ifndef __DYD_ACHIEVEMENTS__
 #define __DYD_ACHIEVEMENTS__
 
-#define MAX_ACHIEVEMENTS 13
+#define MAX_ACHIEVEMENTS 14
 
 enum dyd_achievement_types
 {

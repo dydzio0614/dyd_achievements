@@ -83,6 +83,9 @@
     <ClInclude Include="achievements.h" />
     <ClInclude Include="hookdata.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="possible features.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

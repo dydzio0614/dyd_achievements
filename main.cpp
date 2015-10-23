@@ -42,7 +42,7 @@ level_locals_t* g_level = (level_locals_t*)0x20ae90b8;
 
 
 int numericId = 1;
-int dydmove_cooldown = 0;
+int dydmove_cooldown[MAX_CLIENTS] = { 0 };
 
 
 int Accounts_Stats_GetPlayerKills(Account_t *acc)
@@ -62,6 +62,17 @@ int Accounts_Stats_GetPlayerDefeats(Account_t *acc)
 	{
 		char data[32];
 		sprintf(data, "%s", Accounts_Custom_GetValue(acc, "A_DATA_PLAYERDEATHS"));
+		return strtol(data, NULL, 0);
+	}
+	else return 0;
+}
+
+int Accounts_Stats_GetSelfshots(Account_t *acc)
+{
+	if (acc)
+	{
+		char data[32];
+		sprintf(data, "%s", Accounts_Custom_GetValue(acc, "A_DATA_SELFSHOTS"));
 		return strtol(data, NULL, 0);
 	}
 	else return 0;
@@ -87,8 +98,44 @@ void Accounts_Stats_SetPlayerDefeats(Account_t *acc, int value)
 	}
 }
 
+void Accounts_Stats_SetSelfshots(Account_t *acc, int value)
+{
+	if (acc)
+	{
+		char data[32];
+		sprintf(data, "%d", value);
+		Accounts_Custom_SetValue(acc, "A_DATA_SELFSHOTS", data);
+	}
+}
+
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath)
 {
+	if (attacker && self == attacker && self->s.number < MAX_CLIENTS && //attacker ps.truejedi if not working?
+		(meansOfDeath == MOD_BLASTER || meansOfDeath == MOD_BOWCASTER || meansOfDeath == MOD_REPEATER || meansOfDeath == MOD_FLECHETTE || meansOfDeath == MOD_BRYAR_PISTOL || meansOfDeath == MOD_BRYAR_PISTOL_ALT))
+	{	//update selfshots
+		if (self->client->pers.Lmd.account) 
+		{
+			int selfshots = Accounts_Stats_GetSelfshots(self->client->pers.Lmd.account);
+
+			if (selfshots)
+			{
+				selfshots++;
+				Accounts_Stats_SetSelfshots(self->client->pers.Lmd.account, selfshots);
+			}
+			else
+				Accounts_Stats_SetSelfshots(self->client->pers.Lmd.account, 1);
+
+			if (achievements_progress(self, "A_FIGHT_SELFSHOT1", qfalse) == 1 && Accounts_Custom_GetValue(self->client->pers.Lmd.account, "A_FIGHT_SELFSHOT1") == NULL)
+			{
+				Accounts_Custom_SetValue(self->client->pers.Lmd.account, "A_FIGHT_SELFSHOT1", "1");
+				dyd_achievement *x = FindAchievementByTextIdentifier("A_FIGHT_SELFSHOT1");
+				self->client->pers.Lmd.account->credits += x->reward_credits; 
+				self->client->pers.Lmd.account->modifiedTime = g_level->time;
+				g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", self->client->pers.netname, x->name));
+			}
+		}
+	}
+
 	if (attacker && self != attacker && self->s.number < MAX_CLIENTS && attacker->s.number < MAX_CLIENTS)
 	{
 		if (attacker->client->pers.Lmd.account)
@@ -195,9 +242,9 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 		//if (!stricmp(command, "dydmove") && acc && Accounts_Custom_GetValue(acc, "A_DUELS_ENGAGE3") != NULL) //for final version
 		if (!stricmp(command, "dydmove"))
 		{
-			if (g_level->time - dydmove_cooldown > 20000)
+			if (g_level->time - dydmove_cooldown[arg0] > 20000)
 			{
-				dydmove_cooldown = g_level->time;
+				dydmove_cooldown[arg0] = g_level->time;
 				user->client->ps.saberMove = 50; //change to proper one before release
 				user->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
 			}
@@ -245,7 +292,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 			if (g_syscall(G_ARGC) < 2)
 			{
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3Usage: achievements <category> - list achievements in category\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^5Available categories:\nFight\nDuels\nMisc\nClaimable\nServerhelper\n\"");
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^5Available categories:\nFight\nDuels\nMisc\nServerhelper\nClaimable\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements claim <ID> - claims achievement completion\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements show <ID> - shows achievement description\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements help - shows detailed description of achievement system\n\"");
@@ -433,6 +480,19 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 		}
 
 	}
+
+	if (cmd == GAME_CLIENT_CONNECT)
+	{
+		dydmove_cooldown[arg0] = 0;
+		JASS_RET_SUPERCEDE(1);
+	}
+
+	if (cmd == GAME_CLIENT_DISCONNECT)
+	{
+		dydmove_cooldown[arg0] = 0;
+		JASS_RET_SUPERCEDE(1);
+	}
+
 	JASS_RET_IGNORED(1);
 }
 
@@ -637,6 +697,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		int wins = Accounts_Stats_GetDuelsWon(user->client->pers.Lmd.account);
 		float ratio = (float)wins / (float)(duels - wins);
 
+		//if(duels - wins == 0) ratio = 0;
+
 		if (duels >= 500 && ratio >= 1.0f)
 		{
 			if (print == qtrue)
@@ -710,6 +772,28 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 				char buf[256];
 				sprintf(buf, "Your current progress of the achievement: %d/2500 duels, %.2f duel ratio (2.0 needed)\n", duels, (float)ratio);
 				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%s\"", buf));
+			}
+			return 0;
+		}
+	}
+
+	else if (!stricmp(x, "A_FIGHT_SELFSHOT1"))
+	{
+		int selfshots = Accounts_Stats_GetSelfshots(user->client->pers.Lmd.account); //seconds
+																				   //int deaths = Accounts_Stats_GetPlayerDefeats(user->client->pers.Lmd.account); //in case we want to show kill / death ratio
+		if (selfshots >= 100)
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/100 suicidal shots - you finished the goal\n\"", selfshots));
+			}
+			return 1;
+		}
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/100 suicidal shots\n\"", selfshots));
 			}
 			return 0;
 		}
@@ -889,4 +973,12 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[12].reward_credits = 300000;
 	sprintf(achievements[12].description, "Donate at least $5 to help the server stay. That allows you to get one-time special reward on one of your accounts. Reward: %d credits.", achievements[12].reward_credits);
 	achievements[12].autoclaimable = qtrue;
+
+	achievements[13].type = ACHIEVEMENT_FIGHT;
+	achievements[13].id_numeric = numericId++;
+	achievements[13].identifier = "A_FIGHT_SELFSHOT1";
+	achievements[13].name = "Brainless shooter";
+	achievements[13].reward_credits = 10000;
+	sprintf(achievements[13].description, "Die 100 times from your own non-splash bullet. This achievement is not something to be proud of. Reward: %d credits.", achievements[13].reward_credits);
+	achievements[13].autoclaimable = qtrue;
 }
