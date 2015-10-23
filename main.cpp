@@ -110,13 +110,14 @@ void Accounts_Stats_SetSelfshots(Account_t *acc, int value)
 
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath)
 {
-	if (attacker && self == attacker && self->s.number < MAX_CLIENTS && //attacker ps.truejedi if not working?
-		(meansOfDeath == MOD_BLASTER || meansOfDeath == MOD_BOWCASTER || meansOfDeath == MOD_REPEATER || meansOfDeath == MOD_FLECHETTE || meansOfDeath == MOD_BRYAR_PISTOL || meansOfDeath == MOD_BRYAR_PISTOL_ALT))
+	//(if attacker has prof jedi or is NPC with saber and self is not jedi and self has proper weapon up and methodofdeath is proper)
+	if (attacker && self != attacker && self->s.number < MAX_CLIENTS && ( (attacker->s.number < MAX_CLIENTS && attacker->client->ps.trueJedi == qtrue ) || (attacker->s.number >= MAX_CLIENTS && attacker->client->ps.weapon == WP_SABER) ) && self->client->ps.trueJedi == qfalse && 
+		( (self->client->ps.weapon == WP_BRYAR_PISTOL && (meansOfDeath == MOD_BRYAR_PISTOL || meansOfDeath == MOD_BRYAR_PISTOL_ALT)) || 
+			(self->client->ps.weapon == WP_BLASTER && meansOfDeath == MOD_BLASTER) || (self->client->ps.weapon == WP_REPEATER && meansOfDeath == MOD_REPEATER) || (self->client->ps.weapon == WP_BOWCASTER && meansOfDeath == MOD_BOWCASTER)) )
 	{	//update selfshots
 		if (self->client->pers.Lmd.account) 
 		{
 			int selfshots = Accounts_Stats_GetSelfshots(self->client->pers.Lmd.account);
-
 			if (selfshots)
 			{
 				selfshots++;
@@ -484,13 +485,13 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 	if (cmd == GAME_CLIENT_CONNECT)
 	{
 		dydmove_cooldown[arg0] = 0;
-		JASS_RET_SUPERCEDE(1);
+		JASS_RET_IGNORED(1);
 	}
 
 	if (cmd == GAME_CLIENT_DISCONNECT)
 	{
 		dydmove_cooldown[arg0] = 0;
-		JASS_RET_SUPERCEDE(1);
+		JASS_RET_IGNORED(1);
 	}
 
 	JASS_RET_IGNORED(1);
