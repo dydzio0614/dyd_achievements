@@ -126,14 +126,8 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 			else
 				Accounts_Stats_SetSelfshots(self->client->pers.Lmd.account, 1);
 
-			if (achievements_progress(self, "A_FIGHT_SELFSHOT1", qfalse) == 1 && Accounts_Custom_GetValue(self->client->pers.Lmd.account, "A_FIGHT_SELFSHOT1") == NULL)
-			{
-				Accounts_Custom_SetValue(self->client->pers.Lmd.account, "A_FIGHT_SELFSHOT1", "1");
-				dyd_achievement *x = FindAchievementByTextIdentifier("A_FIGHT_SELFSHOT1");
-				self->client->pers.Lmd.account->credits += x->reward_credits; 
-				self->client->pers.Lmd.account->modifiedTime = g_level->time;
-				g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", self->client->pers.netname, x->name));
-			}
+			//achievement checks
+			achievements_check(self, FindAchievementByTextIdentifier("A_FIGHT_SELFSHOT1"), qfalse);
 		}
 	}
 
@@ -152,32 +146,12 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				Accounts_Stats_SetPlayerKills(attacker->client->pers.Lmd.account, 1);
 
 			//achievement checks
-			if (achievements_progress(attacker, "A_FIGHT_PKILL1", qfalse) == 1 && Accounts_Custom_GetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL1") == NULL)
-			{
-				Accounts_Custom_SetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL1", "1");
-				dyd_achievement *x = FindAchievementByTextIdentifier("A_FIGHT_PKILL1");
-				attacker->client->pers.Lmd.account->credits += x->reward_credits; //maybe further refactor using achievements_claim?
-				attacker->client->pers.Lmd.account->modifiedTime = g_level->time;
-				g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", attacker->client->pers.netname, x->name));
-			}
+			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PKILL1"), qfalse);
 
-			if (achievements_progress(attacker, "A_FIGHT_PKILL2", qfalse) == 1 && Accounts_Custom_GetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL2") == NULL)
-			{
-				Accounts_Custom_SetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL2", "1");
-				dyd_achievement *x = FindAchievementByTextIdentifier("A_FIGHT_PKILL2");
-				attacker->client->pers.Lmd.account->credits += x->reward_credits;
-				attacker->client->pers.Lmd.account->modifiedTime = g_level->time;
-				g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", attacker->client->pers.netname, x->name));
-			}
+			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PKILL2"), qfalse);
 
-			if (achievements_progress(attacker, "A_FIGHT_PKILL3", qfalse) == 1 && Accounts_Custom_GetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL3") == NULL)
-			{
-				Accounts_Custom_SetValue(attacker->client->pers.Lmd.account, "A_FIGHT_PKILL3", "1");
-				dyd_achievement *x = FindAchievementByTextIdentifier("A_FIGHT_PKILL3");
-				attacker->client->pers.Lmd.account->credits += x->reward_credits;
-				attacker->client->pers.Lmd.account->modifiedTime = g_level->time;
-				g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", attacker->client->pers.netname, x->name));
-			}
+			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PKILL3"), qfalse);
+
 		}
 
 		if (self->client->pers.Lmd.account)
@@ -434,7 +408,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 						{
 							if (achievements[i].autoclaimable == qfalse)
 							{
-								achievements_check(user, &achievements[i]);
+								achievements_check(user, &achievements[i], qtrue);
 								JASS_RET_SUPERCEDE(1);
 							}
 							g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^7This achievement is not claimable! Its completion is granted automatically.\n\"");
@@ -804,9 +778,9 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 }
 
 
-void achievements_check(gentity_t *user, dyd_achievement *x) //achievement unlock logic
+void achievements_check(gentity_t *user, dyd_achievement *x, qboolean print) //achievement unlock logic
 {
-	int state = achievements_progress(user, x->identifier, qtrue);
+	int state = achievements_progress(user, x->identifier, print);
 
 	if (state != -1)
 	{	
@@ -819,17 +793,17 @@ void achievements_check(gentity_t *user, dyd_achievement *x) //achievement unloc
 				user->client->pers.Lmd.account->credits += x->reward_credits; //extend if new types of rewards added
 				user->client->pers.Lmd.account->modifiedTime = g_level->time; //ALWAYS modify this field like that if doing direct changes to account fields
 
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^2Achievement unlocked successfully!\n\"");
+				if(print == qtrue) g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^2Achievement unlocked successfully!\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", user->client->pers.netname, x->name));
 			}
 			else
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^3You do not meet requirements to claim this achievement!\n\"");
+				if (print == qtrue) g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^3You do not meet requirements to claim this achievement!\n\"");
 		}
 		else
-			g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^3This achievement is already completed!\n\"");
+			if (print == qtrue) g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^3This achievement is already completed!\n\"");
 	}
 
-	else g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^1Internal error! No claiming mechanics for valid achievement\n\""); //achievement not found by identifier
+	else if (print == qtrue) g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^1Internal error! No claiming mechanics for valid achievement\n\""); //achievement not found by identifier
 }
 
 

@@ -28,7 +28,7 @@ struct dyd_achievement achievements[MAX_ACHIEVEMENTS];
 
 //headers of functions defined in main:
 void achievements_init();
-void achievements_check(gentity_t*, dyd_achievement*);
+void achievements_check(gentity_t*, dyd_achievement*, qboolean);
 void achievements_list(gentity_t*, enum dyd_achievement_types, qboolean);
 int achievements_progress(gentity_t*, const char*, qboolean);
 
