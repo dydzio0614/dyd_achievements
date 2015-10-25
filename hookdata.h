@@ -17,7 +17,7 @@ extern int(*Accounts_Stats_GetDeaths)(Account_t *acc);
 extern int(*Accounts_Stats_GetDuels)(Account_t *acc);
 extern int(*Accounts_Stats_GetDuelsWon)(Account_t *acc);
 extern int(*Accounts_Stats_GetStashes)(Account_t *acc);
-extern int Accounts_Stats_GetShots(Account_t *acc);
+extern int(*Accounts_Stats_GetShots)(Account_t *acc);
 
 //player_die data
 #define PLAYER_DIE 0x200d15f0

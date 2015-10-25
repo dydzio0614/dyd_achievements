@@ -2,7 +2,55 @@
 
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath)
 {
-	//(if attacker has prof jedi or is NPC with saber and self is not jedi and self has proper weapon up and methodofdeath is proper)
+	//PISTOL DUELS
+	if (attacker && self != attacker && self->s.number < MAX_CLIENTS && attacker->s.number < MAX_CLIENTS &&
+		(self->client->ps.weapon == WP_BRYAR_PISTOL && (meansOfDeath == MOD_BRYAR_PISTOL || meansOfDeath == MOD_BRYAR_PISTOL_ALT)) && attacker->client->ps.weapon == WP_BRYAR_PISTOL)
+	{
+		if (attacker->client->pers.Lmd.account)
+		{
+			int pistol_duels = Accounts_Stats_GetPistolDuels(attacker->client->pers.Lmd.account);
+
+			if (pistol_duels)
+			{
+				pistol_duels++;
+				Accounts_Stats_SetPistolDuels(attacker->client->pers.Lmd.account, pistol_duels);
+			}
+			else
+				Accounts_Stats_SetPistolDuels(attacker->client->pers.Lmd.account, 1);
+
+
+			int pistol_wins = Accounts_Stats_GetPistolDuelWins(attacker->client->pers.Lmd.account);
+
+			if (pistol_wins)
+			{
+				pistol_wins++;
+				Accounts_Stats_SetPistolDuelWins(attacker->client->pers.Lmd.account, pistol_wins);
+			}
+			else
+				Accounts_Stats_SetPistolDuelWins(attacker->client->pers.Lmd.account, 1);
+
+			//achievement checks
+			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PISTOL1"), qfalse);
+			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PISTOL2"), qfalse);
+			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PISTOL3"), qfalse);
+		}
+
+		if (self->client->pers.Lmd.account)
+		{
+			int pistol_duels = Accounts_Stats_GetPistolDuels(self->client->pers.Lmd.account);
+
+			if (pistol_duels)
+			{
+				pistol_duels++;
+				Accounts_Stats_SetPistolDuels(self->client->pers.Lmd.account, pistol_duels);
+			}
+			else
+				Accounts_Stats_SetPistolDuels(self->client->pers.Lmd.account, 1);
+		}
+	}
+
+
+	//SELF SHOT
 	if (attacker && self != attacker && self->s.number < MAX_CLIENTS && ((attacker->s.number < MAX_CLIENTS && attacker->client->ps.trueJedi == qtrue) || (attacker->s.number >= MAX_CLIENTS && attacker->client->ps.weapon == WP_SABER)) && self->client->ps.trueJedi == qfalse &&
 		((self->client->ps.weapon == WP_BRYAR_PISTOL && (meansOfDeath == MOD_BRYAR_PISTOL || meansOfDeath == MOD_BRYAR_PISTOL_ALT)) ||
 			(self->client->ps.weapon == WP_BLASTER && meansOfDeath == MOD_BLASTER) || (self->client->ps.weapon == WP_REPEATER && meansOfDeath == MOD_REPEATER) || (self->client->ps.weapon == WP_BOWCASTER && meansOfDeath == MOD_BOWCASTER)))
@@ -24,6 +72,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		}
 	}
 
+	//PLAYER KILL COUNTING
 	if (attacker && self != attacker && self->s.number < MAX_CLIENTS && attacker->s.number < MAX_CLIENTS)
 	{
 		if (attacker->client->pers.Lmd.account)
@@ -40,11 +89,8 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 			//achievement checks
 			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PKILL1"), qfalse);
-
 			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PKILL2"), qfalse);
-
 			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PKILL3"), qfalse);
-
 		}
 
 		if (self->client->pers.Lmd.account)

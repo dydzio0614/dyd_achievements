@@ -458,6 +458,72 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		}
 	}
 
+	else if (!stricmp(x, "A_DUELS_PISTOL1"))
+	{
+		int pistol_duels = Accounts_Stats_GetPistolDuels(user->client->pers.Lmd.account);
+
+		if (pistol_duels >= 250)
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/250 pistol duels - you finished the goal\n\"", pistol_duels));
+			}
+			return 1;
+		}
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/250 pistol duels\n\"", pistol_duels));
+			}
+			return 0;
+		}
+	}
+
+	else if (!stricmp(x, "A_DUELS_PISTOL2"))
+	{
+		int pistol_duels = Accounts_Stats_GetPistolDuels(user->client->pers.Lmd.account);
+
+		if (pistol_duels >= 750)
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/750 pistol duels - you finished the goal\n\"", pistol_duels));
+			}
+			return 1;
+		}
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/750 pistol duels\n\"", pistol_duels));
+			}
+			return 0;
+		}
+	}
+
+	else if (!stricmp(x, "A_DUELS_PISTOL3"))
+	{
+		int pistol_duels = Accounts_Stats_GetPistolDuels(user->client->pers.Lmd.account);
+
+		if (pistol_duels >= 1500)
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/1500 pistol duels - you finished the goal\n\"", pistol_duels));
+			}
+			return 1;
+		}
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/1500 pistol duels\n\"", pistol_duels));
+			}
+			return 0;
+		}
+	}
+
 	else return -1; //achievement not found by identifier
 }
 
@@ -680,4 +746,28 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[18].reward_credits = 35000;
 	sprintf(achievements[18].description, "Find and deposit 100 stashes. Reward: %d credits.", achievements[18].reward_credits);
 	achievements[18].autoclaimable = qfalse;
+
+	achievements[19].type = ACHIEVEMENT_DUELS;
+	achievements[19].id_numeric = numericId++;
+	achievements[19].identifier = "A_DUELS_PISTOL1";
+	achievements[19].name = "Pistol dueler";
+	achievements[19].reward_credits = 20000;
+	sprintf(achievements[19].description, "Win 250 blaster pistol duels with another player. Reward: %d credits.", achievements[19].reward_credits);
+	achievements[19].autoclaimable = qtrue;
+
+	achievements[20].type = ACHIEVEMENT_DUELS;
+	achievements[20].id_numeric = numericId++;
+	achievements[20].identifier = "A_DUELS_PISTOL2";
+	achievements[20].name = "Precise killer";
+	achievements[20].reward_credits = 45000;
+	sprintf(achievements[20].description, "Win 750 blaster pistol duels against another player. Reward: %d credits.", achievements[20].reward_credits);
+	achievements[20].autoclaimable = qtrue;
+
+	achievements[21].type = ACHIEVEMENT_DUELS;
+	achievements[21].id_numeric = numericId++;
+	achievements[21].identifier = "A_DUELS_PISTOL3";
+	achievements[21].name = "Famous shooter";
+	achievements[21].reward_credits = 75000;
+	sprintf(achievements[21].description, "Win 1500 blaster pistol duels against another player. Reward: %d credits.", achievements[21].reward_credits);
+	achievements[21].autoclaimable = qtrue;
 }

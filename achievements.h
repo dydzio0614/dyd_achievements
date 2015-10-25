@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include "jassapi.h"
 #include "dydutils.h"
-#define MAX_ACHIEVEMENTS 19
+#define MAX_ACHIEVEMENTS 22
 
 enum dyd_achievement_types
 {
