@@ -1,5 +1,4 @@
-#ifndef __DYD_ACHIEVEMENTS__
-#define __DYD_ACHIEVEMENTS__
+#pragma once
 
 #define MAX_ACHIEVEMENTS 14
 
@@ -52,5 +51,3 @@ dyd_achievement* FindAchievementByTextIdentifier(const char *text)
 	}
 	return NULL;
 }
-
-#endif //__DYD_ACHIEVEMENTS__

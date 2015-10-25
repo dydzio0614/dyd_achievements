@@ -1,8 +1,7 @@
 #include <Windows.h>
 #include "jassapi.h" 
-#include "jka_sdk/game/g_local.h"
 #include "achievements.h"
-#include "hookdata.h"
+#include "dydutils.h"
 
 #pragma warning (disable: 4996)
 
@@ -14,25 +13,6 @@ mod_vmMain_t g_vmMain = NULL;
 pluginfuncs_t* g_pluginfuncs = NULL;
 int g_vmbase = 0;
 
-//hooking data
-#define PLAYER_DIE 0x200d15f0
-void execute_address(unsigned int arg);
-void player_die_patchdata();
-void player_die_entry();
-
-//exported functions:
-void(*G_Knockdown)(gentity_t* victim, int duration) = (void(*)(gentity_t*, int))0x200ce8b0; //set ent->client->ps.velocity 1st
-void(*G_Damage2)(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, float *dir, float *point, int damage, int dflags, int mod) = (void(*)(gentity_t*, gentity_t*, gentity_t*, float*, float*, int, int, int))0x200C58E0;
-char* (*Accounts_Custom_GetValue)(Account_t* acc, const char *key) = (char*(*)(Account_t*, const char*))0x201712e0; //KEY/VALUE acc data read, data not existing = return NULL
-void(*Accounts_Custom_SetValue)(Account_t* acc, const char *key, const char *val) = (void(*)(Account_t*, const char*, const char*)) 0x20171350;//KEY/VALUE acc data write
-int(*ClientNumberFromString)(gentity_t* to, const char* s) = (int(*)(gentity_t*, const char*))0x200b5a10; //as name says
-gentity_t* (*GetEnt)(int index) = (gentity_t*(*)(int))0x20193150; //return entity struct for entity with proper index
-
-int(*Accounts_Stats_GetKills)(Account_t *acc) = (int(*)(Account_t*))0x20174F30;
-int(*Accounts_Stats_GetDeaths)(Account_t *acc) = (int(*)(Account_t*))0x20174DF0;
-int(*Accounts_Stats_GetDuels)(Account_t *acc) = (int(*)(Account_t*))0x20174E40;
-int(*Accounts_Stats_GetDuelsWon)(Account_t *acc) = (int(*)(Account_t*))0x20174E90;
-int(*Accounts_Stats_GetStashes)(Account_t *acc) = (int(*)(Account_t*))0x20174FD0;
 
 //game function headers
 void player_die(gentity_t*, gentity_t*, gentity_t*, int, int);
@@ -44,69 +24,6 @@ level_locals_t* g_level = (level_locals_t*)0x20ae90b8;
 int numericId = 1;
 int dydmove_cooldown[MAX_CLIENTS] = { 0 };
 
-
-int Accounts_Stats_GetPlayerKills(Account_t *acc)
-{
-	if (acc)
-	{
-		char data[32];
-		sprintf(data, "%s", Accounts_Custom_GetValue(acc, "A_DATA_PLAYERKILLS"));
-		return strtol(data, NULL, 0);
-	}
-	else return 0;
-}
-
-int Accounts_Stats_GetPlayerDefeats(Account_t *acc)
-{
-	if (acc)
-	{
-		char data[32];
-		sprintf(data, "%s", Accounts_Custom_GetValue(acc, "A_DATA_PLAYERDEATHS"));
-		return strtol(data, NULL, 0);
-	}
-	else return 0;
-}
-
-int Accounts_Stats_GetSelfshots(Account_t *acc)
-{
-	if (acc)
-	{
-		char data[32];
-		sprintf(data, "%s", Accounts_Custom_GetValue(acc, "A_DATA_SELFSHOTS"));
-		return strtol(data, NULL, 0);
-	}
-	else return 0;
-}
-
-void Accounts_Stats_SetPlayerKills(Account_t *acc, int value)
-{
-	if (acc)
-	{
-		char data[32];
-		sprintf(data, "%d", value);
-		Accounts_Custom_SetValue(acc, "A_DATA_PLAYERKILLS", data);
-	}
-}
-
-void Accounts_Stats_SetPlayerDefeats(Account_t *acc, int value)
-{
-	if (acc)
-	{
-		char data[32];
-		sprintf(data, "%d", value);
-		Accounts_Custom_SetValue(acc, "A_DATA_PLAYERDEATHS", data);
-	}
-}
-
-void Accounts_Stats_SetSelfshots(Account_t *acc, int value)
-{
-	if (acc)
-	{
-		char data[32];
-		sprintf(data, "%d", value);
-		Accounts_Custom_SetValue(acc, "A_DATA_SELFSHOTS", data);
-	}
-}
 
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath)
 {
@@ -207,7 +124,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 	{
 		char command[32];
 
-		gentity_t* user = g_level->gentities + arg0;
+		gentity_t* user = g_level->gentities; //g_level->gentities + arg0;
 		Account_t* acc = user->client->pers.Lmd.account;
 
 		g_syscall(G_ARGV, 0, command, sizeof(command)); //getting cmd

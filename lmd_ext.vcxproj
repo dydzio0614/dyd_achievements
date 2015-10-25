@@ -77,10 +77,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="dydutils.cpp" />
+    <ClCompile Include="hookdata.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="achievements.h" />
+    <ClInclude Include="dydutils.h" />
     <ClInclude Include="hookdata.h" />
   </ItemGroup>
   <ItemGroup>
