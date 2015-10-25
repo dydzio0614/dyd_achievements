@@ -10,7 +10,6 @@ mod_vmMain_t g_vmMain = NULL;
 pluginfuncs_t* g_pluginfuncs = NULL;
 int g_vmbase = 0;
 
-
 //global data
 extern struct dyd_achievement achievements[MAX_ACHIEVEMENTS];
 
@@ -49,7 +48,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 	{
 		char command[32];
 
-		gentity_t* user = g_level->gentities + arg0; //g_level->gentities + arg0;
+		gentity_t* user = g_level->gentities + arg0;
 		Account_t* acc = user->client->pers.Lmd.account;
 
 		g_syscall(G_ARGV, 0, command, sizeof(command)); //getting cmd
@@ -327,5 +326,3 @@ C_DLLEXPORT int JASS_syscall_Post(int cmd, int arg0, int arg1, int arg2, int arg
 {
 	JASS_RET_IGNORED(1);
 }
-
-
