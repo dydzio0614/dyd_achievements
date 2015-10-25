@@ -292,8 +292,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 
 	else if (!stricmp(x, "A_FIGHT_SELFSHOT1"))
 	{
-		int selfshots = Accounts_Stats_GetSelfshots(user->client->pers.Lmd.account); //seconds
-																					 //int deaths = Accounts_Stats_GetPlayerDefeats(user->client->pers.Lmd.account); //in case we want to show kill / death ratio
+		int selfshots = Accounts_Stats_GetSelfshots(user->client->pers.Lmd.account); 
+																					
 		if (selfshots >= 100)
 		{
 			if (print == qtrue)
@@ -307,6 +307,152 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 			if (print == qtrue)
 			{
 				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/100 suicidal shots\n\"", selfshots));
+			}
+			return 0;
+		}
+	}
+
+	else if (!stricmp(x, "A_FIGHT_AMMO1"))
+	{
+		int ammo = Accounts_Stats_GetShots(user->client->pers.Lmd.account);
+		
+		if (ammo >= 20000)
+		{
+			if (user->client->pers.Lmd.account->time >= 18000)
+			{
+				if (print == qtrue)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/20000 ammo fired - you finished the goal\n\"", ammo));
+				}
+				return 1;
+			}
+			else
+			{
+				if (print == qtrue)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/20000 ammo fired - you finished the goal, BUT achievement requirement is not completed!\n\"", ammo));
+				}
+				return 0;
+			}
+		}
+
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/20000 ammo fired\n\"", ammo));
+			}
+			return 0;
+		}
+	}
+
+	else if (!stricmp(x, "A_FIGHT_AMMO2"))
+	{
+		int ammo = Accounts_Stats_GetShots(user->client->pers.Lmd.account);
+
+		if (ammo >= 50000)
+		{
+			if (user->client->pers.Lmd.account->time >= 18000)
+			{
+				if (print == qtrue)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/50000 ammo fired - you finished the goal\n\"", ammo));
+				}
+				return 1;
+			}
+			else
+			{
+				if (print == qtrue)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/50000 ammo fired - you finished the goal, BUT achievement requirement is not completed!\n\"", ammo));
+				}
+				return 0;
+			}
+		}
+
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/50000 ammo fired\n\"", ammo));
+			}
+			return 0;
+		}
+	}
+
+	else if (!stricmp(x, "A_FIGHT_AMMO3"))
+	{
+		int ammo = Accounts_Stats_GetShots(user->client->pers.Lmd.account);
+
+		if (ammo >= 150000)
+		{
+			if (user->client->pers.Lmd.account->time >= 18000)
+			{
+				if (print == qtrue)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/150000 ammo fired - you finished the goal\n\"", ammo));
+				}
+				return 1;
+			}
+			else
+			{
+				if (print == qtrue)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/150000 ammo fired - you finished the goal, BUT achievement requirement is not completed!\n\"", ammo));
+				}
+				return 0;
+			}
+		}
+
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/150000 ammo fired\n\"", ammo));
+			}
+			return 0;
+		}
+	}
+
+	else if (!stricmp(x, "A_MISC_STASH1"))
+	{
+		int stashes = Accounts_Stats_GetStashes(user->client->pers.Lmd.account);
+
+		if (stashes >= 25)
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/25 stashes - you finished the goal\n\"", stashes));
+			}
+			return 1;
+		}
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/25 stashes\n\"", stashes));
+			}
+			return 0;
+		}
+	}
+
+	else if (!stricmp(x, "A_MISC_STASH2"))
+	{
+		int stashes = Accounts_Stats_GetStashes(user->client->pers.Lmd.account);
+
+		if (stashes >= 100)
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/100 stashes - you finished the goal\n\"", stashes));
+			}
+			return 1;
+		}
+		else
+		{
+			if (print == qtrue)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/100 stashes\n\"", stashes));
 			}
 			return 0;
 		}
@@ -420,7 +566,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[4].identifier = "A_FIGHT_PKILL3";
 	achievements[4].name = "Conqueror";
 	achievements[4].reward_credits = 160000;
-	sprintf(achievements[4].description, "Kill 10000 players. Reward: %d credits", achievements[4].reward_credits);
+	sprintf(achievements[4].description, "Kill 10000 players. Reward: (hidden)");
 	achievements[4].autoclaimable = qtrue;
 
 	achievements[5].type = ACHIEVEMENT_DUELS;
@@ -492,6 +638,46 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[13].identifier = "A_FIGHT_SELFSHOT1";
 	achievements[13].name = "Brainless shooter";
 	achievements[13].reward_credits = 10000;
-	sprintf(achievements[13].description, "Die 100 times from your own non-splash bullet. This achievement is not something to be proud of. Reward: %d credits.", achievements[13].reward_credits);
+	sprintf(achievements[13].description, "Die 100 times from your own non-splash bullet. This achievement is not something to be proud of. Prerequirement: 5 hours played on account. Reward: %d credits.", achievements[13].reward_credits);
 	achievements[13].autoclaimable = qtrue;
+
+	achievements[14].type = ACHIEVEMENT_FIGHT;
+	achievements[14].id_numeric = numericId++;
+	achievements[14].identifier = "A_FIGHT_AMMO1";
+	achievements[14].name = "Ammo consumer";
+	achievements[14].reward_credits = 7000;
+	sprintf(achievements[14].description, "Fire 20000 bullets. Prerequirement: 5 hours played on account. Reward: %d credits.", achievements[14].reward_credits);
+	achievements[14].autoclaimable = qfalse;
+
+	achievements[15].type = ACHIEVEMENT_FIGHT;
+	achievements[15].id_numeric = numericId++;
+	achievements[15].identifier = "A_FIGHT_AMMO2";
+	achievements[15].name = "Metal waster";
+	achievements[15].reward_credits = 15000;
+	sprintf(achievements[15].description, "Fire 50000 bullets. Prerequirement: 5 hours played on account. Reward: %d credits.", achievements[15].reward_credits);
+	achievements[15].autoclaimable = qfalse;
+
+	achievements[16].type = ACHIEVEMENT_FIGHT;
+	achievements[16].id_numeric = numericId++;
+	achievements[16].identifier = "A_FIGHT_AMMO3";
+	achievements[16].name = "Ammo, ammo everywhere";
+	achievements[16].reward_credits = 40000;
+	sprintf(achievements[16].description, "Fire 150000 bullets. Prerequirement: 5 hours played on account. Reward: %d credits.", achievements[16].reward_credits);
+	achievements[16].autoclaimable = qfalse;
+
+	achievements[17].type = ACHIEVEMENT_MISC;
+	achievements[17].id_numeric = numericId++;
+	achievements[17].identifier = "A_MISC_STASH1";
+	achievements[17].name = "Stash finder";
+	achievements[17].reward_credits = 10000;
+	sprintf(achievements[17].description, "Find and deposit 25 stashes. Reward: %d credits.", achievements[17].reward_credits);
+	achievements[17].autoclaimable = qfalse;
+
+	achievements[18].type = ACHIEVEMENT_MISC;
+	achievements[18].id_numeric = numericId++;
+	achievements[18].identifier = "A_MISC_STASH2";
+	achievements[18].name = "Stash lover";
+	achievements[18].reward_credits = 35000;
+	sprintf(achievements[18].description, "Find and deposit 100 stashes. Reward: %d credits.", achievements[18].reward_credits);
+	achievements[18].autoclaimable = qfalse;
 }

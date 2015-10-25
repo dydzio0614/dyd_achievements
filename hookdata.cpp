@@ -13,6 +13,7 @@ int(*Accounts_Stats_GetDeaths)(Account_t *acc) = (int(*)(Account_t*))0x20174DF0;
 int(*Accounts_Stats_GetDuels)(Account_t *acc) = (int(*)(Account_t*))0x20174E40;
 int(*Accounts_Stats_GetDuelsWon)(Account_t *acc) = (int(*)(Account_t*))0x20174E90;
 int(*Accounts_Stats_GetStashes)(Account_t *acc) = (int(*)(Account_t*))0x20174FD0;
+extern int Accounts_Stats_GetShots(Account_t *acc) = (int(*)(Account_t*))0x20174F80;
 
 //GENERAL HOOKING STUFF
 
