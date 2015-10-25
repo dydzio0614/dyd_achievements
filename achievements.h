@@ -1,5 +1,7 @@
 #pragma once
-
+#include <Windows.h>
+#include "jassapi.h"
+#include "dydutils.h"
 #define MAX_ACHIEVEMENTS 14
 
 enum dyd_achievement_types
@@ -22,7 +24,7 @@ struct dyd_achievement
 	qboolean autoclaimable;
 };
 
-struct dyd_achievement achievements[MAX_ACHIEVEMENTS];
+
 
 
 //headers of functions defined in main:
@@ -32,22 +34,5 @@ void achievements_list(gentity_t*, enum dyd_achievement_types, qboolean);
 int achievements_progress(gentity_t*, const char*, qboolean);
 
 //utility functions
-dyd_achievement* FindAchievementById(int value)
-{
-	for (int i = 0; i < MAX_ACHIEVEMENTS; i++)
-	{
-		if (achievements[i].id_numeric == value)
-			return &achievements[i];
-	}
-	return NULL;
-}
-
-dyd_achievement* FindAchievementByTextIdentifier(const char *text)
-{
-	for (int i = 0; i < MAX_ACHIEVEMENTS; i++)
-	{
-		if (!stricmp(text, achievements[i].identifier))
-			return &achievements[i];
-	}
-	return NULL;
-}
+dyd_achievement* FindAchievementById(int);
+dyd_achievement* FindAchievementByTextIdentifier(const char*);

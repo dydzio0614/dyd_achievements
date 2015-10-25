@@ -77,14 +77,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="achievements.cpp" />
     <ClCompile Include="dydutils.cpp" />
     <ClCompile Include="hookdata.cpp" />
+    <ClCompile Include="hookedfunctions.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="achievements.h" />
     <ClInclude Include="dydutils.h" />
     <ClInclude Include="hookdata.h" />
+    <ClInclude Include="hookedfunctions.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="possible features.txt" />
