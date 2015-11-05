@@ -55,17 +55,41 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 
 		//flavor commands
 
-		//if (!stricmp(command, "dydmove") && acc && Accounts_Custom_GetValue(acc, "A_DUELS_ENGAGE3") != NULL) //for final version
-		if (!stricmp(command, "dydmove"))
+		if (!stricmp(command, "saberbarrier") && acc && Accounts_Custom_GetValue(acc, "A_DUELS_ENGAGE3") != NULL)
 		{
+			if (user->client->sess.spectatorState)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while spectating.\n\"");
+				JASS_RET_SUPERCEDE(1);
+			}
+
+			if (user->client->ps.pm_type == PM_DEAD)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command when you are dead.\n\"");
+				JASS_RET_SUPERCEDE(1);
+			}
+
+			if (user->client->ps.m_iVehicleNum)
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while using a vehicle.\n\"");
+				JASS_RET_SUPERCEDE(1);
+			}
+
+			if (!(user->client->ps.weapon == WP_SABER && user->client->ps.saberHolstered != 2))
+			{
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You must have saber up to use this skill.\n\"");
+				JASS_RET_SUPERCEDE(1);
+			}
+
 			if (g_level->time - dydmove_cooldown[arg0] > 20000)
 			{
 				dydmove_cooldown[arg0] = g_level->time;
+				user->client->invulnerableTimer = 0;
 				user->client->ps.saberMove = 50; //change to proper one before release
 				user->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
 			}
 			else
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You have to wait before using this skill again.\n\"");
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^1You have to wait %d seconds before using this skill again.\n\"", (20000 - (g_level->time - dydmove_cooldown[arg0]) ) / 1000 ));
 
 			JASS_RET_SUPERCEDE(1);
 		}
@@ -112,6 +136,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements claim <ID> - claims achievement completion\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements show <ID> - shows achievement description\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements help - shows detailed description of achievement system\n\"");
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1Remember that all achievements require 20 hours played on account before they can be completed.\n\"");
 				JASS_RET_SUPERCEDE(1);
 			}
 
@@ -179,7 +204,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					g_syscall(G_ARGV, 2, arg, sizeof(arg));
 					if (!stricmp(arg, "ext"))
 					{
-						achievements_list(user, ACHIEVEMENT_DUELS, qtrue);
+						achievements_list(user, ACHIEVEMENT_HELPER, qtrue);
 						JASS_RET_SUPERCEDE(1);
 					}
 				}
@@ -229,6 +254,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements show <ID> - displays detailed information about specific achievement\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements claim <ID> - use to complete claimable achievements.\n\"");
 				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1IMPORTANT! ID is number usually shown together with achievement name. Using anything else instead at places where ID is required will not work.\n\"");
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1ALL achievements have requirement of 20 hours played on account before any of them can be completed.\n\"");
 				JASS_RET_SUPERCEDE(1);
 			}
 

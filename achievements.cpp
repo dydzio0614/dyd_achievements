@@ -208,9 +208,10 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 	{
 		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
 		int wins = Accounts_Stats_GetDuelsWon(user->client->pers.Lmd.account);
-		float ratio = (float)wins / (float)(duels - wins);
+		float ratio = 0;
 
-		//if(duels - wins == 0) ratio = 0;
+		if ( (duels - wins) != 0) 
+			ratio = (float)wins / (float)(duels - wins);
 
 		if (duels >= 500 && ratio >= 1.0f)
 		{
@@ -238,7 +239,10 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 	{
 		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
 		int wins = Accounts_Stats_GetDuelsWon(user->client->pers.Lmd.account);
-		float ratio = (float)wins / (float)(duels - wins);
+		float ratio = 0;
+
+		if ((duels - wins) != 0)
+			ratio = (float)wins / (float)(duels - wins);
 
 		if (duels >= 1250 && ratio >= 1.5f)
 		{
@@ -266,7 +270,10 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 	{
 		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
 		int wins = Accounts_Stats_GetDuelsWon(user->client->pers.Lmd.account);
-		float ratio = (float)wins / (float)(duels - wins);
+		float ratio = 0;
+
+		if ((duels - wins) != 0)
+			ratio = (float)wins / (float)(duels - wins);
 
 		if (duels >= 2500 && ratio >= 2.0f)
 		{
@@ -318,22 +325,11 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		
 		if (ammo >= 20000)
 		{
-			if (user->client->pers.Lmd.account->time >= 18000)
+			if (print == qtrue)
 			{
-				if (print == qtrue)
-				{
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/20000 ammo fired - you finished the goal\n\"", ammo));
-				}
-				return 1;
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/20000 ammo fired - you finished the goal\n\"", ammo));
 			}
-			else
-			{
-				if (print == qtrue)
-				{
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/20000 ammo fired - you finished the goal, BUT achievement requirement is not completed!\n\"", ammo));
-				}
-				return 0;
-			}
+			return 1;
 		}
 
 		else
@@ -352,22 +348,11 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 
 		if (ammo >= 50000)
 		{
-			if (user->client->pers.Lmd.account->time >= 18000)
+			if (print == qtrue)
 			{
-				if (print == qtrue)
-				{
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/50000 ammo fired - you finished the goal\n\"", ammo));
-				}
-				return 1;
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/50000 ammo fired - you finished the goal\n\"", ammo));
 			}
-			else
-			{
-				if (print == qtrue)
-				{
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/50000 ammo fired - you finished the goal, BUT achievement requirement is not completed!\n\"", ammo));
-				}
-				return 0;
-			}
+			return 1;
 		}
 
 		else
@@ -386,22 +371,11 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 
 		if (ammo >= 150000)
 		{
-			if (user->client->pers.Lmd.account->time >= 18000)
+			if (print == qtrue)
 			{
-				if (print == qtrue)
-				{
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/150000 ammo fired - you finished the goal\n\"", ammo));
-				}
-				return 1;
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/150000 ammo fired - you finished the goal\n\"", ammo));
 			}
-			else
-			{
-				if (print == qtrue)
-				{
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/150000 ammo fired - you finished the goal, BUT achievement requirement is not completed!\n\"", ammo));
-				}
-				return 0;
-			}
+			return 1;
 		}
 
 		else
@@ -418,11 +392,11 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 	{
 		int stashes = Accounts_Stats_GetStashes(user->client->pers.Lmd.account);
 
-		if (stashes >= 25)
+		if (stashes >= 50)
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/25 stashes - you finished the goal\n\"", stashes));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/50 stashes - you finished the goal\n\"", stashes));
 			}
 			return 1;
 		}
@@ -430,7 +404,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/25 stashes\n\"", stashes));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/50 stashes\n\"", stashes));
 			}
 			return 0;
 		}
@@ -440,11 +414,11 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 	{
 		int stashes = Accounts_Stats_GetStashes(user->client->pers.Lmd.account);
 
-		if (stashes >= 100)
+		if (stashes >= 200)
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/100 stashes - you finished the goal\n\"", stashes));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/200 stashes - you finished the goal\n\"", stashes));
 			}
 			return 1;
 		}
@@ -452,7 +426,7 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/100 stashes\n\"", stashes));
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/200 stashes\n\"", stashes));
 			}
 			return 0;
 		}
@@ -538,13 +512,18 @@ void achievements_check(gentity_t *user, dyd_achievement *x, qboolean print) //a
 		{
 			if (state == 1)
 			{
-				Accounts_Custom_SetValue(user->client->pers.Lmd.account, x->identifier, "1");
+				if (user->client->pers.Lmd.account->time >= 72000)
+				{
+					Accounts_Custom_SetValue(user->client->pers.Lmd.account, x->identifier, "1");
 
-				user->client->pers.Lmd.account->credits += x->reward_credits; //extend if new types of rewards added
-				user->client->pers.Lmd.account->modifiedTime = g_level->time; //ALWAYS modify this field like that if doing direct changes to account fields
+					user->client->pers.Lmd.account->credits += x->reward_credits; //extend if new types of rewards added
+					user->client->pers.Lmd.account->modifiedTime = g_level->time; //ALWAYS modify this field like that if doing direct changes to account fields
 
-				if (print == qtrue) g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^2Achievement unlocked successfully!\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s has completed achievement: %s\n\"", user->client->pers.netname, x->name));
+					if (print == qtrue) g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^2Achievement unlocked successfully!\n\"");
+					g_syscall(G_SEND_SERVER_COMMAND, -1, JASS_VARARGS("chat \"^7Player %s^7 has completed achievement: %s\n\"", user->client->pers.netname, x->name));
+				}
+				else
+					if(print == qtrue) g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^3You have to play at least 20 hours on account to claim any achievement!\n\"");
 			}
 			else
 				if (print == qtrue) g_syscall(G_SEND_SERVER_COMMAND, user->s.number, "print \"^3You do not meet requirements to claim this achievement!\n\"");
@@ -656,7 +635,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[7].identifier = "A_DUELS_ENGAGE3";
 	achievements[7].name = "Saber freak";
 	achievements[7].reward_credits = 100000;
-	sprintf(achievements[7].description, "Play 3000 saber duels and win at least 1500 duels total. Reward: %d credits. You are allowed to perform dual saber kata hit under any condition with 20 seconds cooldown", achievements[7].reward_credits);
+	sprintf(achievements[7].description, "Play 3000 saber duels and win at least 1500 duels total. Reward: %d credits. You are allowed to perform special saber attack with any saber type under any condition with 20 seconds cooldown (/saberbarrier command)", achievements[7].reward_credits);
 	achievements[7].autoclaimable = qfalse;
 
 	achievements[8].type = ACHIEVEMENT_DUELS;
@@ -679,7 +658,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[10].id_numeric = numericId++;
 	achievements[10].identifier = "A_DUELS_DRATIO3";
 	achievements[10].name = "Duel master";
-	achievements[10].reward_credits = 250000;
+	achievements[10].reward_credits = 200000;
 	sprintf(achievements[10].description, "Play 2500 saber duels. Have at least 2x more wins than defeats on duels you played. Reward: %d credits.", achievements[10].reward_credits);
 	achievements[10].autoclaimable = qfalse;
 
@@ -695,7 +674,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[12].id_numeric = numericId++;
 	achievements[12].identifier = "A_HELPER_DONATOR";
 	achievements[12].name = "Wallet warrior";
-	achievements[12].reward_credits = 300000;
+	achievements[12].reward_credits = 250000;
 	sprintf(achievements[12].description, "Donate at least $5 to help the server stay. That allows you to get one-time special reward on one of your accounts. Reward: %d credits.", achievements[12].reward_credits);
 	achievements[12].autoclaimable = qtrue;
 
@@ -704,15 +683,15 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[13].identifier = "A_FIGHT_SELFSHOT1";
 	achievements[13].name = "Brainless shooter";
 	achievements[13].reward_credits = 10000;
-	sprintf(achievements[13].description, "Die 100 times from your own non-splash bullet. This achievement is not something to be proud of. Prerequirement: 5 hours played on account. Reward: %d credits.", achievements[13].reward_credits);
+	sprintf(achievements[13].description, "Die 100 times from your own non-splash bullet. This achievement is not something to be proud of. Reward: %d credits.", achievements[13].reward_credits);
 	achievements[13].autoclaimable = qtrue;
 
 	achievements[14].type = ACHIEVEMENT_FIGHT;
 	achievements[14].id_numeric = numericId++;
 	achievements[14].identifier = "A_FIGHT_AMMO1";
 	achievements[14].name = "Ammo consumer";
-	achievements[14].reward_credits = 7000;
-	sprintf(achievements[14].description, "Fire 20000 bullets. Prerequirement: 5 hours played on account. Reward: %d credits.", achievements[14].reward_credits);
+	achievements[14].reward_credits = 5000;
+	sprintf(achievements[14].description, "Fire 20000 bullets. Reward: %d credits.", achievements[14].reward_credits);
 	achievements[14].autoclaimable = qfalse;
 
 	achievements[15].type = ACHIEVEMENT_FIGHT;
@@ -720,7 +699,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[15].identifier = "A_FIGHT_AMMO2";
 	achievements[15].name = "Metal waster";
 	achievements[15].reward_credits = 15000;
-	sprintf(achievements[15].description, "Fire 50000 bullets. Prerequirement: 5 hours played on account. Reward: %d credits.", achievements[15].reward_credits);
+	sprintf(achievements[15].description, "Fire 50000 bullets. Reward: %d credits.", achievements[15].reward_credits);
 	achievements[15].autoclaimable = qfalse;
 
 	achievements[16].type = ACHIEVEMENT_FIGHT;
@@ -728,15 +707,15 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[16].identifier = "A_FIGHT_AMMO3";
 	achievements[16].name = "Ammo, ammo everywhere";
 	achievements[16].reward_credits = 40000;
-	sprintf(achievements[16].description, "Fire 150000 bullets. Prerequirement: 5 hours played on account. Reward: %d credits.", achievements[16].reward_credits);
+	sprintf(achievements[16].description, "Fire 150000 bullets. Reward: %d credits.", achievements[16].reward_credits);
 	achievements[16].autoclaimable = qfalse;
 
 	achievements[17].type = ACHIEVEMENT_MISC;
 	achievements[17].id_numeric = numericId++;
 	achievements[17].identifier = "A_MISC_STASH1";
 	achievements[17].name = "Stash finder";
-	achievements[17].reward_credits = 10000;
-	sprintf(achievements[17].description, "Find and deposit 25 stashes. Reward: %d credits.", achievements[17].reward_credits);
+	achievements[17].reward_credits = 5000;
+	sprintf(achievements[17].description, "Find and deposit 50 stashes. Reward: %d credits.", achievements[17].reward_credits);
 	achievements[17].autoclaimable = qfalse;
 
 	achievements[18].type = ACHIEVEMENT_MISC;
@@ -744,7 +723,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[18].identifier = "A_MISC_STASH2";
 	achievements[18].name = "Stash lover";
 	achievements[18].reward_credits = 35000;
-	sprintf(achievements[18].description, "Find and deposit 100 stashes. Reward: %d credits.", achievements[18].reward_credits);
+	sprintf(achievements[18].description, "Find and deposit 200 stashes. Reward: %d credits.", achievements[18].reward_credits);
 	achievements[18].autoclaimable = qfalse;
 
 	achievements[19].type = ACHIEVEMENT_DUELS;
