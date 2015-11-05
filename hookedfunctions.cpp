@@ -30,9 +30,9 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				Accounts_Stats_SetPistolDuelWins(attacker->client->pers.Lmd.account, 1);
 
 			//achievement checks
-			achievements_check(attacker, FindAchievementByTextIdentifier("A_DUELS_PISTOL1"), qfalse);
-			achievements_check(attacker, FindAchievementByTextIdentifier("A_DUELS_PISTOL2"), qfalse);
-			achievements_check(attacker, FindAchievementByTextIdentifier("A_DUELS_PISTOL3"), qfalse);
+			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PISTOL1"), qfalse);
+			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PISTOL2"), qfalse);
+			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PISTOL3"), qfalse);
 		}
 
 		if (self->client->pers.Lmd.account)
@@ -67,6 +67,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				Accounts_Stats_SetSelfshots(self->client->pers.Lmd.account, 1);
 
 			//achievement checks
+			if(self->client->pers.Lmd.account->time >= 18000)
 			achievements_check(self, FindAchievementByTextIdentifier("A_FIGHT_SELFSHOT1"), qfalse);
 		}
 	}
