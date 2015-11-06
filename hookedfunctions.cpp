@@ -51,23 +51,26 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 
 	//SELF SHOT
-	if (attacker && self != attacker && self->s.number < MAX_CLIENTS && ((attacker->s.number < MAX_CLIENTS && attacker->client->ps.trueJedi == qtrue) || (attacker->s.number >= MAX_CLIENTS && attacker->client->ps.weapon == WP_SABER)) && self->client->ps.trueJedi == qfalse &&
-		((self->client->ps.weapon == WP_BRYAR_PISTOL && (meansOfDeath == MOD_BRYAR_PISTOL || meansOfDeath == MOD_BRYAR_PISTOL_ALT)) ||
+	if (attacker && self != attacker && self->s.number < MAX_CLIENTS  && self->client->ps.trueJedi == qfalse && //if not suicide and not force user prof
+		((self->client->ps.weapon == WP_BRYAR_PISTOL && (meansOfDeath == MOD_BRYAR_PISTOL || meansOfDeath == MOD_BRYAR_PISTOL_ALT)) || //restrict method of death to nonsplash guns and check if player weapon is same as bullet
 			(self->client->ps.weapon == WP_BLASTER && meansOfDeath == MOD_BLASTER) || (self->client->ps.weapon == WP_REPEATER && meansOfDeath == MOD_REPEATER) || (self->client->ps.weapon == WP_BOWCASTER && meansOfDeath == MOD_BOWCASTER)))
-	{	//update selfshots
-		if (self->client->pers.Lmd.account)
+	{
+		if ((attacker->s.number < MAX_CLIENTS && attacker->client->ps.trueJedi == qtrue) || (attacker->NPC && attacker->client->ps.weapon == WP_SABER)) //check if attacker is either force user or NPC with saber
 		{
-			int selfshots = Accounts_Stats_GetSelfshots(self->client->pers.Lmd.account);
-			if (selfshots)
+			if (self->client->pers.Lmd.account)
 			{
-				selfshots++;
-				Accounts_Stats_SetSelfshots(self->client->pers.Lmd.account, selfshots);
-			}
-			else
-				Accounts_Stats_SetSelfshots(self->client->pers.Lmd.account, 1);
+				int selfshots = Accounts_Stats_GetSelfshots(self->client->pers.Lmd.account);
+				if (selfshots)
+				{
+					selfshots++;
+					Accounts_Stats_SetSelfshots(self->client->pers.Lmd.account, selfshots);
+				}
+				else
+					Accounts_Stats_SetSelfshots(self->client->pers.Lmd.account, 1);
 
-			//achievement checks
-			achievements_check(self, FindAchievementByTextIdentifier("A_FIGHT_SELFSHOT1"), qfalse);
+				//achievement checks
+				achievements_check(self, FindAchievementByTextIdentifier("A_FIGHT_SELFSHOT1"), qfalse);
+			}
 		}
 	}
 
