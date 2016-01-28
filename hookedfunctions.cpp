@@ -1,5 +1,8 @@
 #include "hookedfunctions.h"
 
+BYTE oldPlayerDie[6];
+jmp_far jump;
+
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath)
 {
 	//PISTOL DUELS
@@ -109,11 +112,8 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		}
 	}
 
-	__asm
-	{
-		mov esp, ebp
-		pop ebp
-	} //end function, but without returning to pre-call place
-
-	execute_address((unsigned int)player_die_entry);
+	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&oldPlayerDie, 6, NULL);
+	((void(__cdecl*)(gentity_t*, gentity_t*, gentity_t*, int, int))PLAYER_DIE)(self, inflictor, attacker, damage, meansOfDeath);
+	jump.arg = (DWORD)(&player_die);
+	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&jump, 6, NULL);
 }

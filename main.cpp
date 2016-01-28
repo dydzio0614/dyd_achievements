@@ -14,7 +14,8 @@ int g_vmbase = 0;
 extern struct dyd_achievement achievements[MAX_ACHIEVEMENTS];
 
 extern level_locals_t* g_level;
-
+extern BYTE oldPlayerDie[6];
+extern jmp_far jump;
 
 int dydmove_cooldown[MAX_CLIENTS] = { 0 };
 
@@ -24,7 +25,12 @@ C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginr
 	JASS_SAVE_VARS();
 	achievements_init();
 
-	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, player_die_patchdata, 6, NULL);
+	jump.instr_push = 0x68;
+	jump.instr_ret = 0xC3;
+
+	jump.arg = (DWORD)(&player_die);
+	ReadProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&oldPlayerDie, 6, NULL);
+	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&jump, 6, NULL);
 
 	iscmd = 0;
 	return 1;
@@ -32,9 +38,7 @@ C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginr
 
 C_DLLEXPORT void JASS_Detach(int iscmd)
 {
-	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, player_die_entry, 8, NULL);
-
-	iscmd = 0;
+	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&oldPlayerDie, 6, NULL);
 }
 
 C_DLLEXPORT void JASS_Query(plugininfo_t** pinfo)
