@@ -10,5 +10,5 @@ struct jmp_far
 };
 #pragma pack (pop)
 
-#define PLAYER_DIE 0x200d15f0
+#define PLAYER_DIE 0x200d17d0
 void player_die(gentity_t*, gentity_t*, gentity_t*, int, int);
