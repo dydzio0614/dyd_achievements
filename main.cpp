@@ -3,7 +3,7 @@
 #pragma warning (disable: 4996)
 
 //plugin info
-plugininfo_t g_plugininfo = { "dydplugin", "1.0", "Lugormod U# 2.4.8.3 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR };
+plugininfo_t g_plugininfo = { "dydplugin", "1.0.1", "Lugormod U# 2.4.9.0 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR };
 pluginres_t* g_result = NULL;
 eng_syscall_t g_syscall = NULL;
 mod_vmMain_t g_vmMain = NULL;
