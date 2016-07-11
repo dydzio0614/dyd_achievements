@@ -3,7 +3,7 @@
 #pragma warning (disable: 4996)
 
 //plugin info
-plugininfo_t g_plugininfo = { "dydplugin", "1.0", "Lugormod U# 2.4.8.3 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR };
+plugininfo_t g_plugininfo = { "dydplugin", "1.0.1", "Lugormod U# 2.4.9 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR };
 pluginres_t* g_result = NULL;
 eng_syscall_t g_syscall = NULL;
 mod_vmMain_t g_vmMain = NULL;
@@ -11,9 +11,14 @@ pluginfuncs_t* g_pluginfuncs = NULL;
 int g_vmbase = 0;
 
 //global data
+extern jmp_far jump;
+
 extern struct dyd_achievement achievements[MAX_ACHIEVEMENTS];
 
 extern level_locals_t* g_level;
+
+extern unsigned char oldPlayerDie[6];
+
 
 
 int dydmove_cooldown[MAX_CLIENTS] = { 0 };
@@ -24,7 +29,12 @@ C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginr
 	JASS_SAVE_VARS();
 	achievements_init();
 
-	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, player_die_patchdata, 6, NULL);
+	jump.instr_push = 0x68;
+	jump.instr_ret = 0xC3;
+
+	jump.arg = (DWORD)(&player_die);
+	ReadProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&oldPlayerDie, 6, NULL);
+	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&jump, 6, NULL);
 
 	iscmd = 0;
 	return 1;
@@ -32,7 +42,7 @@ C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginr
 
 C_DLLEXPORT void JASS_Detach(int iscmd)
 {
-	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, player_die_entry, 8, NULL);
+	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&oldPlayerDie, 6, NULL);
 
 	iscmd = 0;
 }

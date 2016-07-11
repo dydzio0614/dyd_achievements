@@ -1,5 +1,19 @@
 #pragma once
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 #include "jka_sdk\game\g_local.h"
+#include "lmdaddr.h"
+
+//struct used as asm code snippet to hook functions - performs push addr;ret to change EIP register value
+#pragma pack (push, 1) //1 byte struct aligning
+struct jmp_far
+{
+	unsigned char instr_push;
+	unsigned long arg;
+	unsigned char instr_ret;
+};
+#pragma pack (pop)
+
 
 //generic functions
 void execute_address(unsigned int arg);
@@ -20,6 +34,5 @@ extern int(*Accounts_Stats_GetStashes)(Account_t *acc);
 extern int(*Accounts_Stats_GetShots)(Account_t *acc);
 
 //player_die data
-#define PLAYER_DIE 0x200d15f0
 void player_die_patchdata();
 void player_die_entry();

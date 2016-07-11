@@ -2,7 +2,7 @@
 
 struct dyd_achievement achievements[MAX_ACHIEVEMENTS];
 
-level_locals_t* g_level = (level_locals_t*)0x20ae90b8;
+level_locals_t* g_level = (level_locals_t*)LEVEL;
 int numericId = 1;
 
 dyd_achievement* FindAchievementById(int value)
