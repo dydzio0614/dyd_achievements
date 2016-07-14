@@ -25,7 +25,7 @@ dyd_achievement* FindAchievementByTextIdentifier(const char *text)
 	return NULL;
 }
 
-int achievements_progress(gentity_t *user, const char *x, qboolean print) //check progress, can be used in unlock to check requirements, can be used to display progress
+int achievements_progress(gentity_t *user, const char *x, qboolean print) //check progress, can be used in unlock to check requirements, can be used to display progress, WARNING: USES DispContiguous to display data, need to call DispContiguous(user, NULL) after func call
 {
 	if (!stricmp(x, "A_MISC_PLAYTIME1"))
 	{
@@ -35,7 +35,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/25 hours - you finished the goal\n\"", hours));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement : %d / 25 hours - you finished the goal\n", hours));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/25 hours - you finished the goal\n\"", hours));
 			}
 			return 1;
 		}
@@ -43,7 +44,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/25 hours\n\"", hours));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/25 hours\n", hours));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/25 hours\n\"", hours));
 			}
 			return 0;
 		}
@@ -57,7 +59,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/100 hours - you finished the goal\n\"", hours));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/100 hours - you finished the goal\n", hours));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/100 hours - you finished the goal\n\"", hours));
 			}
 			return 1;
 		}
@@ -65,7 +68,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/100 hours\n\"", hours));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/100 hours\n", hours));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/100 hours\n\"", hours));
 			}
 			return 0;
 		}
@@ -79,7 +83,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/1000 kills - you finished the goal\n\"", kills));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/1000 kills - you finished the goal\n", kills));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/1000 kills - you finished the goal\n\"", kills));
 			}
 			return 1;
 		}
@@ -87,7 +92,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/1000 kills\n\"", kills));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/1000 kills\n", kills));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/1000 kills\n\"", kills));
 			}
 			return 0;
 		}
@@ -101,7 +107,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/5000 kills - you finished the goal\n\"", kills));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/5000 kills - you finished the goal\n", kills));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/5000 kills - you finished the goal\n\"", kills));
 			}
 			return 1;
 		}
@@ -109,7 +116,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/5000 kills\n\"", kills));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/5000 kills\n", kills));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/5000 kills\n\"", kills));
 			}
 			return 0;
 		}
@@ -123,7 +131,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/10000 kills - you finished the goal\n\"", kills));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/10000 kills - you finished the goal\n", kills));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/10000 kills - you finished the goal\n\"", kills));
 			}
 			return 1;
 		}
@@ -131,7 +140,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/10000 kills\n\"", kills));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/10000 kills\n", kills));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/10000 kills\n\"", kills));
 			}
 			return 0;
 		}
@@ -145,7 +155,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/500 duels - you finished the goal\n\"", duels));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/500 duels - you finished the goal\n", duels));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/500 duels - you finished the goal\n\"", duels));
 			}
 			return 1;
 		}
@@ -153,7 +164,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/500 duels\n\"", duels));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/500 duels\n", duels));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/500 duels\n\"", duels));
 			}
 			return 0;
 		}
@@ -167,7 +179,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/1500 duels - you finished the goal\n\"", duels));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/1500 duels - you finished the goal\n", duels));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/1500 duels - you finished the goal\n\"", duels));
 			}
 			return 1;
 		}
@@ -175,7 +188,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/1500 duels\n\"", duels));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/1500 duels\n", duels));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/1500 duels\n\"", duels));
 			}
 			return 0;
 		}
@@ -190,7 +204,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/3000 duels, %d/1500 duels won - you finished the goal\n\"", duels, wins));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/3000 duels, %d/1500 duels won - you finished the goal\n", duels, wins));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/3000 duels, %d/1500 duels won - you finished the goal\n\"", duels, wins));
 			}
 			return 1;
 		}
@@ -198,7 +213,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/3000 duels, %d/1500 duels won\n\"", duels, wins));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/3000 duels, %d/1500 duels won\n", duels, wins));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/3000 duels, %d/1500 duels won\n\"", duels, wins));
 			}
 			return 0;
 		}
@@ -219,7 +235,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 			{
 				char buf[256];
 				sprintf(buf, "Your current progress of the achievement: %d/500 duels, %.2f duel ratio (1.0 needed) - you finished the goal\n", duels, (float)ratio);
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2%s\"", buf));
+				DispContiguous(user, JASS_VARARGS("^2%s", buf));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2%s\"", buf));
 			}
 			return 1;
 		}
@@ -229,7 +246,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 			{
 				char buf[256];
 				sprintf(buf, "Your current progress of the achievement: %d/500 duels, %.2f duel ratio (1.0 needed)\n", duels, (float)ratio);
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%s\"", buf));
+				DispContiguous(user, JASS_VARARGS("^3%s", buf));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%s\"", buf));
 			}
 			return 0;
 		}
@@ -250,7 +268,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 			{
 				char buf[256];
 				sprintf(buf, "Your current progress of the achievement: %d/1250 duels, %.2f duel ratio (1.5 needed) - you finished the goal\n", duels, (float)ratio);
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2%s\"", buf));
+				DispContiguous(user, JASS_VARARGS("^2%s", buf));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2%s\"", buf));
 			}
 			return 1;
 		}
@@ -260,7 +279,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 			{
 				char buf[256];
 				sprintf(buf, "Your current progress of the achievement: %d/1250 duels, %.2f duel ratio (1.5 needed)\n", duels, (float)ratio);
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%s\"", buf));
+				DispContiguous(user, JASS_VARARGS("^3%s", buf));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%s\"", buf));
 			}
 			return 0;
 		}
@@ -281,7 +301,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 			{
 				char buf[256];
 				sprintf(buf, "Your current progress of the achievement: %d/2500 duels, %.2f duel ratio (2.0 needed) - you finished the goal\n", duels, (float)ratio);
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2%s\"", buf));
+				DispContiguous(user, JASS_VARARGS("^2%s", buf));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2%s\"", buf));
 			}
 			return 1;
 		}
@@ -291,7 +312,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 			{
 				char buf[256];
 				sprintf(buf, "Your current progress of the achievement: %d/2500 duels, %.2f duel ratio (2.0 needed)\n", duels, (float)ratio);
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%s\"", buf));
+				DispContiguous(user, JASS_VARARGS("^3%s", buf));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%s\"", buf));
 			}
 			return 0;
 		}
@@ -305,7 +327,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/100 suicidal shots - you finished the goal\n\"", selfshots));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/100 suicidal shots - you finished the goal\n", selfshots));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/100 suicidal shots - you finished the goal\n\"", selfshots));
 			}
 			return 1;
 		}
@@ -313,7 +336,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/100 suicidal shots\n\"", selfshots));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/100 suicidal shots\n", selfshots));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/100 suicidal shots\n\"", selfshots));
 			}
 			return 0;
 		}
@@ -327,7 +351,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/20000 ammo fired - you finished the goal\n\"", ammo));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/20000 ammo fired - you finished the goal\n", ammo));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/20000 ammo fired - you finished the goal\n\"", ammo));
 			}
 			return 1;
 		}
@@ -336,7 +361,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/20000 ammo fired\n\"", ammo));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/20000 ammo fired\n", ammo));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/20000 ammo fired\n\"", ammo));
 			}
 			return 0;
 		}
@@ -350,7 +376,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/50000 ammo fired - you finished the goal\n\"", ammo));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/50000 ammo fired - you finished the goal\n", ammo));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/50000 ammo fired - you finished the goal\n\"", ammo));
 			}
 			return 1;
 		}
@@ -359,7 +386,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/50000 ammo fired\n\"", ammo));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/50000 ammo fired\n", ammo));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/50000 ammo fired\n\"", ammo));
 			}
 			return 0;
 		}
@@ -373,7 +401,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/150000 ammo fired - you finished the goal\n\"", ammo));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/150000 ammo fired - you finished the goal\n", ammo));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/150000 ammo fired - you finished the goal\n\"", ammo));
 			}
 			return 1;
 		}
@@ -382,7 +411,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/150000 ammo fired\n\"", ammo));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/150000 ammo fired\n", ammo));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/150000 ammo fired\n\"", ammo));
 			}
 			return 0;
 		}
@@ -396,7 +426,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/50 stashes - you finished the goal\n\"", stashes));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/50 stashes - you finished the goal\n", stashes));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/50 stashes - you finished the goal\n\"", stashes));
 			}
 			return 1;
 		}
@@ -404,7 +435,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/50 stashes\n\"", stashes));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/50 stashes\n", stashes));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/50 stashes\n\"", stashes));
 			}
 			return 0;
 		}
@@ -418,7 +450,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/200 stashes - you finished the goal\n\"", stashes));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/200 stashes - you finished the goal\n", stashes));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/200 stashes - you finished the goal\n\"", stashes));
 			}
 			return 1;
 		}
@@ -426,7 +459,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/200 stashes\n\"", stashes));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/200 stashes\n", stashes));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/200 stashes\n\"", stashes));
 			}
 			return 0;
 		}
@@ -440,7 +474,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/250 pistol duels - you finished the goal\n\"", pistol_duels));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/250 pistol duels - you finished the goal\n", pistol_duels));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/250 pistol duels - you finished the goal\n\"", pistol_duels));
 			}
 			return 1;
 		}
@@ -448,7 +483,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/250 pistol duels\n\"", pistol_duels));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/250 pistol duels\n", pistol_duels));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/250 pistol duels\n\"", pistol_duels));
 			}
 			return 0;
 		}
@@ -462,7 +498,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/750 pistol duels - you finished the goal\n\"", pistol_duels));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/750 pistol duels - you finished the goal\n", pistol_duels));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/750 pistol duels - you finished the goal\n\"", pistol_duels));
 			}
 			return 1;
 		}
@@ -470,7 +507,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/750 pistol duels\n\"", pistol_duels));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/750 pistol duels\n", pistol_duels));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/750 pistol duels\n\"", pistol_duels));
 			}
 			return 0;
 		}
@@ -484,7 +522,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/1500 pistol duels - you finished the goal\n\"", pistol_duels));
+				DispContiguous(user, JASS_VARARGS("^2Your current progress of the achievement: %d/1500 pistol duels - you finished the goal\n", pistol_duels));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2Your current progress of the achievement: %d/1500 pistol duels - you finished the goal\n\"", pistol_duels));
 			}
 			return 1;
 		}
@@ -492,7 +531,8 @@ int achievements_progress(gentity_t *user, const char *x, qboolean print) //chec
 		{
 			if (print == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/1500 pistol duels\n\"", pistol_duels));
+				DispContiguous(user, JASS_VARARGS("^3Your current progress of the achievement: %d/1500 pistol duels\n", pistol_duels));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3Your current progress of the achievement: %d/1500 pistol duels\n\"", pistol_duels));
 			}
 			return 0;
 		}
@@ -545,20 +585,24 @@ void achievements_list(gentity_t *user, enum dyd_achievement_types type, qboolea
 		{
 			if (Accounts_Custom_GetValue(user->client->pers.Lmd.account, achievements[i].identifier) == NULL) //checking for completion
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%d. %s ^5%s\"", achievements[i].id_numeric, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)\n" : "\n"));
+				DispContiguous(user, JASS_VARARGS("^3%d. %s ^5%s", achievements[i].id_numeric, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)\n" : "\n"));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%d. %s ^5%s\"", achievements[i].id_numeric, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)\n" : "\n"));
 			}
 			else
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2%d. %s ^5%s\"", achievements[i].id_numeric, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)^2 - COMPLETED\n" : "^2 - COMPLETED \n"));
+				DispContiguous(user, JASS_VARARGS("^2%d. %s ^5%s", achievements[i].id_numeric, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)^2 - COMPLETED\n" : "^2 - COMPLETED \n"));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2%d. %s ^5%s\"", achievements[i].id_numeric, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)^2 - COMPLETED\n" : "^2 - COMPLETED \n"));
 			}
 
 			if (extended == qtrue)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i].description));
+				DispContiguous(user, JASS_VARARGS("^6Description: %s\n", achievements[i].description));
+				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i].description));
 				achievements_progress(user, achievements[i].identifier, qtrue);
 			}
 		}
 	}
+	DispContiguous(user, NULL);
 }
 
 

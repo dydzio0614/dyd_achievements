@@ -141,12 +141,8 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 
 			if (g_syscall(G_ARGC) < 2)
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3Usage: achievements <category> - list achievements in category\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^5Available categories:\nFight\nDuels\nMisc\nServerhelper\nClaimable\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements claim <ID> - claims achievement completion\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements show <ID> - shows achievement description\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements help - shows detailed description of achievement system\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1Remember that all achievements require 20 hours played on account before they can be completed.\n\"");
+				//change to dispcontiguous in future version
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3Usage: achievements <category> - list achievements in category\n^5Available categories:\nFight\nDuels\nMisc\nServerhelper\nClaimable\n^3achievements claim <ID> - claims achievement completion\n^3achievements show <ID> - shows achievement description\n^3achievements help - shows detailed description of achievement system\n^1Remember that all achievements require 20 hours played on account before they can be completed.\n\"");
 				JASS_RET_SUPERCEDE(1);
 			}
 
@@ -237,34 +233,39 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					{
 						if (Accounts_Custom_GetValue(user->client->pers.Lmd.account, achievements[i].identifier) == NULL)
 						{
-							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^3%d. %s\n\"", achievements[i].id_numeric, achievements[i].name));
+							DispContiguous(user, JASS_VARARGS("^3%d. %s\n", achievements[i].id_numeric, achievements[i].name));
+							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^3%d. %s\n\"", achievements[i].id_numeric, achievements[i].name));
 						}
 						else
 						{
-							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%d. %s - COMPLETED\n\"", achievements[i].id_numeric, achievements[i].name));
+							DispContiguous(user, JASS_VARARGS("^2%d. %s - COMPLETED\n", achievements[i].id_numeric, achievements[i].name));
+							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%d. %s - COMPLETED\n\"", achievements[i].id_numeric, achievements[i].name));
 						}
 
 						if (!stricmp(arg, "ext"))
 						{
-							g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i].description));
+							DispContiguous(user, JASS_VARARGS("^6Description: %s\n", achievements[i].description));
+							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i].description));
 							achievements_progress(user, achievements[i].identifier, qtrue);
 						}
 					}
 				}
+				DispContiguous(user, NULL);
 				JASS_RET_SUPERCEDE(1);				
 			}
 				
 			else if (!stricmp(arg, "help")) //end of categories
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^6Lugormod achievement system by ^0Dyd^1zio^6, version 1.0\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^5It allows two possible kinds of achievements: Claimable achievements, where player must force completion manually, and automatic achievements, where completion and reward are autogranted.\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^5Achievements are assigned to categories, what becomes helpful if number of achievements is large. Special category \'claimable\' shows claimable achievements from all other categories.\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3Possible syntax: \nachievements <category> - displays achievements from category.\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements help - displays this help page \n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements show <ID> - displays detailed information about specific achievement\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3achievements claim <ID> - use to complete claimable achievements.\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1IMPORTANT! ID is number usually shown together with achievement name. Using anything else instead at places where ID is required will not work.\n\"");
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1ALL achievements have requirement of 20 hours played on account before any of them can be completed.\n\"");
+				DispContiguous(user, "^6Lugormod achievement system by ^0Dyd^1zio^6, version 1.0\n");
+				DispContiguous(user, "^5It allows two possible kinds of achievements: Claimable achievements, where player must force completion manually, and automatic achievements, where completion and reward are autogranted.\n");
+				DispContiguous(user, "^5Achievements are assigned to categories, what becomes helpful if number of achievements is large. Special category \'claimable\' shows claimable achievements from all other categories.\n");
+				DispContiguous(user, "^3Possible syntax: \nachievements <category> - displays achievements from category.\n");
+				DispContiguous(user, "^3achievements help - displays this help page \n");
+				DispContiguous(user, "^3achievements show <ID> - displays detailed information about specific achievement\n");
+				DispContiguous(user, "^^3achievements claim <ID> - use to complete claimable achievements.\n");
+				DispContiguous(user, "^1IMPORTANT! ID is number usually shown together with achievement name. Using anything else instead at places where ID is required will not work.\n");
+				DispContiguous(user, "^1ALL achievements have requirement of 20 hours played on account before any of them can be completed.\n");
+				DispContiguous(user, NULL);
 				JASS_RET_SUPERCEDE(1);
 			}
 
@@ -314,6 +315,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					{
 						g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%s\n^6%s\n\"", x->name, x->description));
 						achievements_progress(user, x->identifier, qtrue);
+						DispContiguous(user, NULL);
 						JASS_RET_SUPERCEDE(1);
 					}
 
