@@ -34,9 +34,9 @@ void player_die_new(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, 
 				Accounts_Stats_SetPistolDuelWins(attacker->client->pers.Lmd.account, 1);
 
 			//achievement checks
-			achievements_check(attacker, FindAchievementByTextIdentifier("A_DUELS_PISTOL1"), qfalse);
-			achievements_check(attacker, FindAchievementByTextIdentifier("A_DUELS_PISTOL2"), qfalse);
-			achievements_check(attacker, FindAchievementByTextIdentifier("A_DUELS_PISTOL3"), qfalse);
+			achievements_check(attacker, FindAchievementById(A_DUELS_PISTOL1), qfalse);
+			achievements_check(attacker, FindAchievementById(A_DUELS_PISTOL2), qfalse);
+			achievements_check(attacker, FindAchievementById(A_DUELS_PISTOL3), qfalse);
 		}
 
 		if (self->client->pers.Lmd.account)
@@ -73,7 +73,7 @@ void player_die_new(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, 
 					Accounts_Stats_SetSelfshots(self->client->pers.Lmd.account, 1);
 
 				//achievement checks
-				achievements_check(self, FindAchievementByTextIdentifier("A_FIGHT_SELFSHOT1"), qfalse);
+				achievements_check(self, FindAchievementById(A_FIGHT_SELFSHOT1), qfalse);
 			}
 		}
 	}
@@ -94,9 +94,9 @@ void player_die_new(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, 
 				Accounts_Stats_SetPlayerKills(attacker->client->pers.Lmd.account, 1);
 
 			//achievement checks
-			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PKILL1"), qfalse);
-			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PKILL2"), qfalse);
-			achievements_check(attacker, FindAchievementByTextIdentifier("A_FIGHT_PKILL3"), qfalse);
+			achievements_check(attacker, FindAchievementById(A_FIGHT_PKILL1), qfalse);
+			achievements_check(attacker, FindAchievementById(A_FIGHT_PKILL2), qfalse);
+			achievements_check(attacker, FindAchievementById(A_FIGHT_PKILL3), qfalse);
 		}
 
 		if (self->client->pers.Lmd.account)

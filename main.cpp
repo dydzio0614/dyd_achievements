@@ -3,7 +3,7 @@
 #pragma warning (disable: 4996)
 
 //plugin info
-plugininfo_t g_plugininfo = { "dydplugin", "1.0.2", "Lugormod U# 2.4.9 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR };
+plugininfo_t g_plugininfo = { "dydplugin", "1.1.0", "Lugormod U# 2.4.9 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR };
 pluginres_t* g_result = NULL;
 eng_syscall_t g_syscall = NULL;
 mod_vmMain_t g_vmMain = NULL;
@@ -68,7 +68,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 
 		//flavor commands
 
-		if (!stricmp(command, "saberbarrier") && acc && Accounts_Custom_GetValue(acc, "A_DUELS_ENGAGE3") != NULL)
+		if (!stricmp(command, "saberbarrier") && acc && ((unsigned long)strtol(Accounts_Custom_GetValue(acc, "ACHIEVEMENTS"), 0, NULL)) & GetAchievementBitmaskFromID(A_DUELS_ENGAGE3))
 		{
 			if (user->client->sess.spectatorState)
 			{
@@ -234,7 +234,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				{
 					if (achievements[i].autoclaimable == qfalse)
 					{
-						if (Accounts_Custom_GetValue(user->client->pers.Lmd.account, achievements[i].identifier) == NULL)
+						if (((unsigned long)strtol(Accounts_Custom_GetValue(user->client->pers.Lmd.account, "ACHIEVEMENTS"), 0, NULL)) & GetAchievementBitmaskFromID(achievements[i].id_numeric))
 						{
 							DispContiguous(user, JASS_VARARGS("^3%d. %s", achievements[i].id_numeric, achievements[i].name));
 							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^3%d. %s\n\"", achievements[i].id_numeric, achievements[i].name));
@@ -249,7 +249,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 						{
 							DispContiguous(user, JASS_VARARGS("^6Description: %s", achievements[i].description));
 							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i].description));
-							achievements_progress(user, achievements[i].identifier, qtrue);
+							achievements_progress(user, achievements[i].id_numeric, qtrue);
 						}
 					}
 				}
@@ -259,7 +259,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				
 			else if (!stricmp(arg, "help")) //end of categories
 			{
-				DispContiguous(user, "^6Lugormod achievement system by ^0Dyd^1zio^6, version 1.0.2");
+				DispContiguous(user, "^6Lugormod achievement system by ^0Dyd^1zio^6, version 1.1.0");
 				DispContiguous(user, "^5It allows two possible kinds of achievements: Claimable achievements, where player must force completion manually, and automatic achievements, where completion and reward are autogranted.");
 				DispContiguous(user, "^5Achievements are assigned to categories, what becomes helpful if number of achievements is large. Special category \'claimable\' shows claimable achievements from all other categories.");
 				DispContiguous(user, "^3Possible syntax: \nachievements <category> - displays achievements from category.");
@@ -317,7 +317,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					if (x != NULL)
 					{
 						g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%s\n^6%s\n\"", x->name, x->description));
-						achievements_progress(user, x->identifier, qtrue);
+						achievements_progress(user, x->id_numeric, qtrue);
 						DispContiguous(user, NULL);
 						JASS_RET_SUPERCEDE(1);
 					}
