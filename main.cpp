@@ -3,7 +3,7 @@
 #pragma warning (disable: 4996)
 
 //plugin info
-plugininfo_t g_plugininfo = { "dydplugin", "1.0.1", "Lugormod U# 2.4.9 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR };
+plugininfo_t g_plugininfo = { "dydplugin", "1.0.2", "Lugormod U# 2.4.9 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR };
 pluginres_t* g_result = NULL;
 eng_syscall_t g_syscall = NULL;
 mod_vmMain_t g_vmMain = NULL;
@@ -29,12 +29,12 @@ C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginr
 	JASS_SAVE_VARS();
 	achievements_init();
 
-	jump.instr_push = 0x68;
+	/*jump.instr_push = 0x68;
 	jump.instr_ret = 0xC3;
 
 	jump.arg = (DWORD)(&player_die);
 	ReadProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&oldPlayerDie, 6, NULL);
-	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&jump, 6, NULL);
+	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&jump, 6, NULL);*/
 
 	iscmd = 0;
 	return 1;
@@ -42,7 +42,7 @@ C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginr
 
 C_DLLEXPORT void JASS_Detach(int iscmd)
 {
-	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&oldPlayerDie, 6, NULL);
+	//WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&oldPlayerDie, 6, NULL);
 
 	iscmd = 0;
 }
@@ -59,6 +59,9 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 		char command[32];
 
 		gentity_t* user = g_level->gentities + arg0;
+
+		if (!user || !user->client || user->s.number >= MAX_CLIENTS || !user->client->pers.connected) JASS_RET_IGNORED(1); //anti-exploit
+
 		Account_t* acc = user->client->pers.Lmd.account;
 
 		g_syscall(G_ARGV, 0, command, sizeof(command)); //getting cmd
@@ -233,18 +236,18 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					{
 						if (Accounts_Custom_GetValue(user->client->pers.Lmd.account, achievements[i].identifier) == NULL)
 						{
-							DispContiguous(user, JASS_VARARGS("^3%d. %s\n", achievements[i].id_numeric, achievements[i].name));
+							DispContiguous(user, JASS_VARARGS("^3%d. %s", achievements[i].id_numeric, achievements[i].name));
 							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^3%d. %s\n\"", achievements[i].id_numeric, achievements[i].name));
 						}
 						else
 						{
-							DispContiguous(user, JASS_VARARGS("^2%d. %s - COMPLETED\n", achievements[i].id_numeric, achievements[i].name));
+							DispContiguous(user, JASS_VARARGS("^2%d. %s - COMPLETED", achievements[i].id_numeric, achievements[i].name));
 							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%d. %s - COMPLETED\n\"", achievements[i].id_numeric, achievements[i].name));
 						}
 
 						if (!stricmp(arg, "ext"))
 						{
-							DispContiguous(user, JASS_VARARGS("^6Description: %s\n", achievements[i].description));
+							DispContiguous(user, JASS_VARARGS("^6Description: %s", achievements[i].description));
 							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i].description));
 							achievements_progress(user, achievements[i].identifier, qtrue);
 						}
@@ -256,15 +259,15 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				
 			else if (!stricmp(arg, "help")) //end of categories
 			{
-				DispContiguous(user, "^6Lugormod achievement system by ^0Dyd^1zio^6, version 1.0\n");
-				DispContiguous(user, "^5It allows two possible kinds of achievements: Claimable achievements, where player must force completion manually, and automatic achievements, where completion and reward are autogranted.\n");
-				DispContiguous(user, "^5Achievements are assigned to categories, what becomes helpful if number of achievements is large. Special category \'claimable\' shows claimable achievements from all other categories.\n");
-				DispContiguous(user, "^3Possible syntax: \nachievements <category> - displays achievements from category.\n");
-				DispContiguous(user, "^3achievements help - displays this help page \n");
-				DispContiguous(user, "^3achievements show <ID> - displays detailed information about specific achievement\n");
-				DispContiguous(user, "^^3achievements claim <ID> - use to complete claimable achievements.\n");
-				DispContiguous(user, "^1IMPORTANT! ID is number usually shown together with achievement name. Using anything else instead at places where ID is required will not work.\n");
-				DispContiguous(user, "^1ALL achievements have requirement of 20 hours played on account before any of them can be completed.\n");
+				DispContiguous(user, "^6Lugormod achievement system by ^0Dyd^1zio^6, version 1.0.2");
+				DispContiguous(user, "^5It allows two possible kinds of achievements: Claimable achievements, where player must force completion manually, and automatic achievements, where completion and reward are autogranted.");
+				DispContiguous(user, "^5Achievements are assigned to categories, what becomes helpful if number of achievements is large. Special category \'claimable\' shows claimable achievements from all other categories.");
+				DispContiguous(user, "^3Possible syntax: \nachievements <category> - displays achievements from category.");
+				DispContiguous(user, "^3achievements help - displays this help page");
+				DispContiguous(user, "^3achievements show <ID> - displays detailed information about specific achievement");
+				DispContiguous(user, "^3achievements claim <ID> - use to complete claimable achievements.");
+				DispContiguous(user, "^1IMPORTANT! ID is number usually shown together with achievement name. Using anything else instead at places where ID is required will not work.");
+				DispContiguous(user, "^1ALL achievements have requirement of 20 hours played on account before any of them can be completed.");
 				DispContiguous(user, NULL);
 				JASS_RET_SUPERCEDE(1);
 			}
@@ -352,6 +355,17 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 
 C_DLLEXPORT int JASS_syscall(int cmd, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12)
 {
+	if (cmd == G_UNLINKENTITY)
+	{
+		if (((gentity_t*)arg0)->s.eType == 111)
+		{
+			gentity_t* self = GetEnt(((gentity_t*)arg0)->s.otherEntityNum);
+			gentity_t* attacker = GetEnt(((gentity_t*)arg0)->s.otherEntityNum2);
+			int meansOfDeath = ((gentity_t*)arg0)->s.eventParm;
+			player_die_new(self, attacker, attacker, 0, meansOfDeath);
+		}
+	}
+
 	JASS_RET_IGNORED(1);
 }
 
