@@ -3,7 +3,7 @@
 #pragma warning (disable: 4996)
 
 //plugin info
-plugininfo_t g_plugininfo = { "dydplugin", "1.1.0", "Lugormod U# 2.4.9 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR };
+plugininfo_t g_plugininfo = { "dydplugin", "1.1.1", "Lugormod U# 2.4.9 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR }; //when changing version, update /achievements help version too
 pluginres_t* g_result = NULL;
 eng_syscall_t g_syscall = NULL;
 mod_vmMain_t g_vmMain = NULL;
@@ -264,7 +264,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				
 			else if (!stricmp(arg, "help")) //end of categories
 			{
-				DispContiguous(user, "^6Lugormod achievement system by ^0Dyd^1zio^6, version 1.1.0");
+				DispContiguous(user, "^6Lugormod achievement system by ^0Dyd^1zio^6, version 1.1.1");
 				DispContiguous(user, "^5It allows two possible kinds of achievements: Claimable achievements, where player must force completion manually, and automatic achievements, where completion and reward are autogranted.");
 				DispContiguous(user, "^5Achievements are assigned to categories, what becomes helpful if number of achievements is large. Special category \'claimable\' shows claimable achievements from all other categories.");
 				DispContiguous(user, "^3Possible syntax: \nachievements <category> - displays achievements from category.");

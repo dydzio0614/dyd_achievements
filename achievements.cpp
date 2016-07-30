@@ -628,7 +628,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[x].identifier = "A_TYPE_NAME";
 	achievements[x].name = "NAME";
 	achievements[x].reward_credits = NUMBER;
-	sprintf(achievements[x].description, "DESCRIPTION, reward: %d, achievements[x].reward_credits);
+	sprintf(achievements[x].description, "DESCRIPTION, reward: %d, achievements[x].reward_credits); //change sprintf to JASS_VARARGS ?
 	achievements[x].autoclaimable = qfalse / qtrue;
 	*/
 
