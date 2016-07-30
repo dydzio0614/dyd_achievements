@@ -551,6 +551,7 @@ int achievements_progress(gentity_t *user, dyd_achievement_identifiers x, qboole
 void achievements_check(gentity_t *user, dyd_achievement *x, qboolean print) //achievement unlock logic
 {
 	int state = achievements_progress(user, x->id_numeric, print);
+	DispContiguous(user, NULL);
 
 	if (state != -1)
 	{
@@ -595,14 +596,15 @@ void achievements_list(gentity_t *user, enum dyd_achievement_types type, qboolea
 	{
 		if (achievements[i].type == type)
 		{
-			if (((unsigned long)strtol(Accounts_Custom_GetValue(user->client->pers.Lmd.account, "ACHIEVEMENTS"), 0, NULL)) & GetAchievementBitmaskFromID(achievements[i].id_numeric)) //checking for completion
+			char* bitmaskValue = Accounts_Custom_GetValue(user->client->pers.Lmd.account, "ACHIEVEMENTS");
+			if (bitmaskValue != NULL && ((unsigned long)strtol(bitmaskValue, NULL, 0) & GetAchievementBitmaskFromID(achievements[i].id_numeric))) //checking for completion
 			{
-				DispContiguous(user, JASS_VARARGS("^3%d. %s ^5%s", achievements[i].id_numeric, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)" : ""));
+				DispContiguous(user, JASS_VARARGS("^2%d. %s ^5%s", achievements[i].id_numeric, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)^2 - COMPLETED" : "^2 - COMPLETED"));				
 				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%d. %s ^5%s\"", achievements[i].id_numeric, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)\n" : "\n"));
 			}
 			else
 			{
-				DispContiguous(user, JASS_VARARGS("^2%d. %s ^5%s", achievements[i].id_numeric, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)^2 - COMPLETED" : "^2 - COMPLETED"));
+				DispContiguous(user, JASS_VARARGS("^3%d. %s ^5%s", achievements[i].id_numeric, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)" : ""));
 				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2%d. %s ^5%s\"", achievements[i].id_numeric, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)^2 - COMPLETED\n" : "^2 - COMPLETED \n"));
 			}
 

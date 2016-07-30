@@ -68,43 +68,47 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 
 		//flavor commands
 
-		if (!stricmp(command, "saberbarrier") && acc && ((unsigned long)strtol(Accounts_Custom_GetValue(acc, "ACHIEVEMENTS"), 0, NULL)) & GetAchievementBitmaskFromID(A_DUELS_ENGAGE3))
+		if (!stricmp(command, "saberbarrier") && acc)
 		{
-			if (user->client->sess.spectatorState)
+			char* bitmaskValue = Accounts_Custom_GetValue(user->client->pers.Lmd.account, "ACHIEVEMENTS");
+			if (bitmaskValue != NULL && (unsigned long)strtol(bitmaskValue, NULL, 0) & GetAchievementBitmaskFromID(A_DUELS_ENGAGE3))
 			{
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while spectating.\n\"");
+				if (user->client->sess.spectatorState)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while spectating.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+
+				if (user->client->ps.pm_type == PM_DEAD)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command when you are dead.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+
+				if (user->client->ps.m_iVehicleNum)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while using a vehicle.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+
+				if (!(user->client->ps.weapon == WP_SABER && user->client->ps.saberHolstered != 2))
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You must have saber up to use this skill.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+
+				if (g_level->time - dydmove_cooldown[arg0] > 20000)
+				{
+					dydmove_cooldown[arg0] = g_level->time;
+					user->client->invulnerableTimer = 0;
+					user->client->ps.saberMove = 50; //change to proper one before release
+					user->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
+				}
+				else
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^1You have to wait %d seconds before using this skill again.\n\"", (20000 - (g_level->time - dydmove_cooldown[arg0])) / 1000));
 				JASS_RET_SUPERCEDE(1);
 			}
-
-			if (user->client->ps.pm_type == PM_DEAD)
-			{
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command when you are dead.\n\"");
-				JASS_RET_SUPERCEDE(1);
-			}
-
-			if (user->client->ps.m_iVehicleNum)
-			{
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while using a vehicle.\n\"");
-				JASS_RET_SUPERCEDE(1);
-			}
-
-			if (!(user->client->ps.weapon == WP_SABER && user->client->ps.saberHolstered != 2))
-			{
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You must have saber up to use this skill.\n\"");
-				JASS_RET_SUPERCEDE(1);
-			}
-
-			if (g_level->time - dydmove_cooldown[arg0] > 20000)
-			{
-				dydmove_cooldown[arg0] = g_level->time;
-				user->client->invulnerableTimer = 0;
-				user->client->ps.saberMove = 50; //change to proper one before release
-				user->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
-			}
-			else
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^1You have to wait %d seconds before using this skill again.\n\"", (20000 - (g_level->time - dydmove_cooldown[arg0]) ) / 1000 ));
-
-			JASS_RET_SUPERCEDE(1);
+			JASS_RET_IGNORED(1);
 		}
 
 		/*if (!stricmp(command, "slap"))
@@ -234,14 +238,15 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				{
 					if (achievements[i].autoclaimable == qfalse)
 					{
-						if (((unsigned long)strtol(Accounts_Custom_GetValue(user->client->pers.Lmd.account, "ACHIEVEMENTS"), 0, NULL)) & GetAchievementBitmaskFromID(achievements[i].id_numeric))
+						char* bitmaskValue = Accounts_Custom_GetValue(user->client->pers.Lmd.account, "ACHIEVEMENTS");
+						if (bitmaskValue != NULL && ((unsigned long)strtol(bitmaskValue, NULL, 0) & GetAchievementBitmaskFromID(achievements[i].id_numeric))) //checking for completion
 						{
-							DispContiguous(user, JASS_VARARGS("^3%d. %s", achievements[i].id_numeric, achievements[i].name));
+							DispContiguous(user, JASS_VARARGS("^2%d. %s - COMPLETED", achievements[i].id_numeric, achievements[i].name));
 							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^3%d. %s\n\"", achievements[i].id_numeric, achievements[i].name));
 						}
 						else
 						{
-							DispContiguous(user, JASS_VARARGS("^2%d. %s - COMPLETED", achievements[i].id_numeric, achievements[i].name));
+							DispContiguous(user, JASS_VARARGS("^3%d. %s", achievements[i].id_numeric, achievements[i].name));
 							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%d. %s - COMPLETED\n\"", achievements[i].id_numeric, achievements[i].name));
 						}
 
