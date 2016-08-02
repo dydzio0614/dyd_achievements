@@ -50,6 +50,12 @@ struct dyd_achievement
 	qboolean autoclaimable;
 };
 
+struct dyd_playerdata
+{
+	int dydmove_cooldown[MAX_CLIENTS];
+	int weapon_on_death[MAX_CLIENTS];
+};
+
 
 //headers of achievement management functions
 void achievements_init();

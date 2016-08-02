@@ -4,11 +4,13 @@
 
 unsigned char oldPlayerDie[6];*/
 
+extern struct dyd_playerdata dyd_data;
+
 void player_die_new(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath)
 {
 	//PISTOL DUELS
 	if (attacker && self != attacker && self->s.number < MAX_CLIENTS && attacker->s.number < MAX_CLIENTS &&
-		(self->client->ps.weapon == WP_BRYAR_PISTOL && (meansOfDeath == MOD_BRYAR_PISTOL || meansOfDeath == MOD_BRYAR_PISTOL_ALT)) && attacker->client->ps.weapon == WP_BRYAR_PISTOL)
+		( dyd_data.weapon_on_death[self->s.number] == WP_BRYAR_PISTOL && (meansOfDeath == MOD_BRYAR_PISTOL || meansOfDeath == MOD_BRYAR_PISTOL_ALT)) && attacker->client->ps.weapon == WP_BRYAR_PISTOL)
 	{
 		if (attacker->client->pers.Lmd.account)
 		{
@@ -56,8 +58,8 @@ void player_die_new(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, 
 
 	//SELF SHOT
 	if (attacker && self != attacker && self->s.number < MAX_CLIENTS  && self->client->ps.trueJedi == qfalse && //if not suicide and not force user prof
-		((self->client->ps.weapon == WP_BRYAR_PISTOL && (meansOfDeath == MOD_BRYAR_PISTOL || meansOfDeath == MOD_BRYAR_PISTOL_ALT)) || //restrict method of death to nonsplash guns and check if player weapon is same as bullet
-			(self->client->ps.weapon == WP_BLASTER && meansOfDeath == MOD_BLASTER) || (self->client->ps.weapon == WP_REPEATER && meansOfDeath == MOD_REPEATER) || (self->client->ps.weapon == WP_BOWCASTER && meansOfDeath == MOD_BOWCASTER)))
+		((dyd_data.weapon_on_death[self->s.number] == WP_BRYAR_PISTOL && (meansOfDeath == MOD_BRYAR_PISTOL || meansOfDeath == MOD_BRYAR_PISTOL_ALT)) || //restrict method of death to nonsplash guns and check if player weapon is same as bullet
+			(dyd_data.weapon_on_death[self->s.number] == WP_BLASTER && meansOfDeath == MOD_BLASTER) || (dyd_data.weapon_on_death[self->s.number] == WP_REPEATER && meansOfDeath == MOD_REPEATER) || (dyd_data.weapon_on_death[self->s.number] == WP_BOWCASTER && meansOfDeath == MOD_BOWCASTER)))
 	{
 		if ((attacker->s.number < MAX_CLIENTS && attacker->client->ps.trueJedi == qtrue) || (attacker->NPC && attacker->client->ps.weapon == WP_SABER)) //check if attacker is either force user or NPC with saber
 		{

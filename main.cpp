@@ -17,11 +17,11 @@ extern struct dyd_achievement achievements[MAX_ACHIEVEMENTS];
 
 extern level_locals_t* g_level;
 
-extern unsigned char oldPlayerDie[6];
+//extern unsigned char oldPlayerDie[6];
 
+extern struct dyd_playerdata dyd_data;
 
-
-int dydmove_cooldown[MAX_CLIENTS] = { 0 };
+//int dydmove_cooldown[MAX_CLIENTS] = { 0 };
 
 
 C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginres_t* presult, pluginfuncs_t* pluginfuncs, int iscmd)
@@ -36,6 +36,7 @@ C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginr
 	ReadProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&oldPlayerDie, 6, NULL);
 	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&jump, 6, NULL);*/
 
+	memset(&dyd_data, 0, sizeof(dyd_data));
 	iscmd = 0;
 	return 1;
 }
@@ -97,15 +98,15 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					JASS_RET_SUPERCEDE(1);
 				}
 
-				if (g_level->time - dydmove_cooldown[arg0] > 20000)
+				if (g_level->time - dyd_data.dydmove_cooldown[arg0] > 20000)
 				{
-					dydmove_cooldown[arg0] = g_level->time;
+					dyd_data.dydmove_cooldown[arg0] = g_level->time;
 					user->client->invulnerableTimer = 0;
 					user->client->ps.saberMove = 50; //change to proper one before release
 					user->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
 				}
 				else
-					g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^1You have to wait %d seconds before using this skill again.\n\"", (20000 - (g_level->time - dydmove_cooldown[arg0])) / 1000));
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^1You have to wait %d seconds before using this skill again.\n\"", (20000 - (g_level->time - dyd_data.dydmove_cooldown[arg0])) / 1000));
 				JASS_RET_SUPERCEDE(1);
 			}
 			JASS_RET_IGNORED(1);
@@ -345,13 +346,27 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 
 	if (cmd == GAME_CLIENT_CONNECT)
 	{
-		dydmove_cooldown[arg0] = 0;
+		dyd_data.dydmove_cooldown[arg0] = 0;
+		dyd_data.weapon_on_death[arg0] = 0;
 		JASS_RET_IGNORED(1);
 	}
 
 	if (cmd == GAME_CLIENT_DISCONNECT)
 	{
-		dydmove_cooldown[arg0] = 0;
+		dyd_data.dydmove_cooldown[arg0] = 0;
+		JASS_RET_IGNORED(1);
+	}
+
+	if (cmd == GAME_CLIENT_THINK)
+	{
+		gentity_t* user = g_level->gentities + arg0;
+		if (!user || !user->client || user->s.number >= MAX_CLIENTS || !user->client->pers.connected) JASS_RET_IGNORED(1); //anti-exploit
+
+		if (user->health > 0 && user->client->ps.weapon != WP_NONE) //WP_NONE - invalid weapon
+		{
+			dyd_data.weapon_on_death[arg0] = user->client->ps.weapon;
+		}
+
 		JASS_RET_IGNORED(1);
 	}
 

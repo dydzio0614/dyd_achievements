@@ -3,6 +3,8 @@
 struct dyd_achievement achievements[MAX_ACHIEVEMENTS];
 
 level_locals_t* g_level = (level_locals_t*)LEVEL;
+
+struct dyd_playerdata dyd_data;
 int numericId = 1;
 
 dyd_achievement* FindAchievementById(int value)
