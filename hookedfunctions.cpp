@@ -1,12 +1,10 @@
 #include "hookedfunctions.h"
 
-/*jmp_far jump;
-
-unsigned char oldPlayerDie[6];*/
+/*jmp_far jump;*/
 
 extern struct dyd_playerdata dyd_data;
 
-void player_die_new(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath)
+void player_die_new(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) //this function is not a hook, it is called on unlinkentity syscall
 {
 	//PISTOL DUELS
 	if (attacker && self != attacker && self->s.number < MAX_CLIENTS && attacker->s.number < MAX_CLIENTS &&
@@ -114,9 +112,4 @@ void player_die_new(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, 
 				Accounts_Stats_SetPlayerDefeats(attacker->client->pers.Lmd.account, 1);
 		}
 	}
-
-	/*WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&oldPlayerDie, 6, NULL);
-	((void(__cdecl*)(gentity_t*, gentity_t*, gentity_t*, int, int))PLAYER_DIE)(self, inflictor, attacker, damage, meansOfDeath);
-	jump.arg = (unsigned long)(&player_die);
-	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&jump, 6, NULL);*/
 }

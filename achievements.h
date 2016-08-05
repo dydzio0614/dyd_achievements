@@ -42,8 +42,7 @@ enum dyd_achievement_identifiers
 struct dyd_achievement
 {
 	enum dyd_achievement_types type; //sorting achievements by types
-	enum dyd_achievement_identifiers id_numeric; //main achievement ID
-	//char* identifier; //unique name, previously used for preserving in lugormod account data, now only present in achievements_progress function
+	enum dyd_achievement_identifiers id; //main achievement ID
 	char* name; //name to display
 	char description[256]; //description to display in console
 	int reward_credits;
@@ -52,7 +51,7 @@ struct dyd_achievement
 
 struct dyd_playerdata
 {
-	int dydmove_cooldown[MAX_CLIENTS];
+	int saberbarrier_cooldown[MAX_CLIENTS];
 	int weapon_on_death[MAX_CLIENTS];
 };
 
@@ -65,5 +64,4 @@ int achievements_progress(gentity_t*, enum dyd_achievement_identifiers, qboolean
 
 //utility functions
 dyd_achievement* FindAchievementById(int);
-//dyd_achievement* FindAchievementByTextIdentifier(const char*);
 long GetAchievementBitmaskFromID(long);

@@ -17,11 +17,8 @@ extern struct dyd_achievement achievements[MAX_ACHIEVEMENTS];
 
 extern level_locals_t* g_level;
 
-//extern unsigned char oldPlayerDie[6];
-
 extern struct dyd_playerdata dyd_data;
 
-//int dydmove_cooldown[MAX_CLIENTS] = { 0 };
 
 
 C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginres_t* presult, pluginfuncs_t* pluginfuncs, int iscmd)
@@ -30,11 +27,7 @@ C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginr
 	achievements_init();
 
 	/*jump.instr_push = 0x68;
-	jump.instr_ret = 0xC3;
-
-	jump.arg = (DWORD)(&player_die);
-	ReadProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&oldPlayerDie, 6, NULL);
-	WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&jump, 6, NULL);*/
+	jump.instr_ret = 0xC3;*/
 
 	memset(&dyd_data, 0, sizeof(dyd_data));
 	iscmd = 0;
@@ -43,8 +36,6 @@ C_DLLEXPORT int JASS_Attach(eng_syscall_t engfunc, mod_vmMain_t modfunc, pluginr
 
 C_DLLEXPORT void JASS_Detach(int iscmd)
 {
-	//WriteProcessMemory(GetCurrentProcess(), (void*)PLAYER_DIE, (void*)&oldPlayerDie, 6, NULL);
-
 	iscmd = 0;
 }
 
@@ -98,15 +89,15 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					JASS_RET_SUPERCEDE(1);
 				}
 
-				if (g_level->time - dyd_data.dydmove_cooldown[arg0] > 20000)
+				if (g_level->time - dyd_data.saberbarrier_cooldown[arg0] > 20000)
 				{
-					dyd_data.dydmove_cooldown[arg0] = g_level->time;
+					dyd_data.saberbarrier_cooldown[arg0] = g_level->time;
 					user->client->invulnerableTimer = 0;
 					user->client->ps.saberMove = 50; //change to proper one before release
 					user->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
 				}
 				else
-					g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^1You have to wait %d seconds before using this skill again.\n\"", (20000 - (g_level->time - dyd_data.dydmove_cooldown[arg0])) / 1000));
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^1You have to wait %d seconds before using this skill again.\n\"", (20000 - (g_level->time - dyd_data.saberbarrier_cooldown[arg0])) / 1000));
 				JASS_RET_SUPERCEDE(1);
 			}
 			JASS_RET_IGNORED(1);
@@ -240,22 +231,22 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					if (achievements[i].autoclaimable == qfalse)
 					{
 						char* bitmaskValue = Accounts_Custom_GetValue(user->client->pers.Lmd.account, "ACHIEVEMENTS");
-						if (bitmaskValue != NULL && ((unsigned long)strtol(bitmaskValue, NULL, 0) & GetAchievementBitmaskFromID(achievements[i].id_numeric))) //checking for completion
+						if (bitmaskValue != NULL && ((unsigned long)strtol(bitmaskValue, NULL, 0) & GetAchievementBitmaskFromID(achievements[i].id))) //checking for completion
 						{
-							DispContiguous(user, JASS_VARARGS("^2%d. %s - COMPLETED", achievements[i].id_numeric, achievements[i].name));
-							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^3%d. %s\n\"", achievements[i].id_numeric, achievements[i].name));
+							DispContiguous(user, JASS_VARARGS("^2%d. %s - COMPLETED", achievements[i].id, achievements[i].name));
+							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^3%d. %s\n\"", achievements[i].id, achievements[i].name));
 						}
 						else
 						{
-							DispContiguous(user, JASS_VARARGS("^3%d. %s", achievements[i].id_numeric, achievements[i].name));
-							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%d. %s - COMPLETED\n\"", achievements[i].id_numeric, achievements[i].name));
+							DispContiguous(user, JASS_VARARGS("^3%d. %s", achievements[i].id, achievements[i].name));
+							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%d. %s - COMPLETED\n\"", achievements[i].id, achievements[i].name));
 						}
 
 						if (!stricmp(arg, "ext"))
 						{
 							DispContiguous(user, JASS_VARARGS("^6Description: %s", achievements[i].description));
 							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i].description));
-							achievements_progress(user, achievements[i].id_numeric, qtrue);
+							achievements_progress(user, achievements[i].id, qtrue);
 						}
 					}
 				}
@@ -291,7 +282,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					g_syscall(G_ARGV, 2, id, sizeof(id));
 					for (int i = 0; i < MAX_ACHIEVEMENTS; i++)
 					{
-						if (achievements[i].id_numeric == strtol(id, NULL, 0))
+						if (achievements[i].id == strtol(id, NULL, 0))
 						{
 							if (achievements[i].autoclaimable == qfalse)
 							{
@@ -323,7 +314,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					if (x != NULL)
 					{
 						g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%s\n^6%s\n\"", x->name, x->description));
-						achievements_progress(user, x->id_numeric, qtrue);
+						achievements_progress(user, x->id, qtrue);
 						DispContiguous(user, NULL);
 						JASS_RET_SUPERCEDE(1);
 					}
@@ -344,16 +335,15 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 
 	}
 
-	if (cmd == GAME_CLIENT_CONNECT)
+	/*if (cmd == GAME_CLIENT_CONNECT)
 	{
-		dyd_data.dydmove_cooldown[arg0] = 0;
-		dyd_data.weapon_on_death[arg0] = 0;
 		JASS_RET_IGNORED(1);
-	}
+	}*/
 
 	if (cmd == GAME_CLIENT_DISCONNECT)
 	{
-		dyd_data.dydmove_cooldown[arg0] = 0;
+		dyd_data.saberbarrier_cooldown[arg0] = 0;
+		dyd_data.weapon_on_death[arg0] = 0;
 		JASS_RET_IGNORED(1);
 	}
 
