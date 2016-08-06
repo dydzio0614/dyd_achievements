@@ -219,7 +219,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				JASS_RET_SUPERCEDE(1);
 			}
 
-			else if (!stricmp(arg, "claimable")) //logic separated from achievements_list() but similar
+			else if (!stricmp(arg, "claimable")) //logic separated from achievements_list() but similar, TODO: try to refactor to avoid code duplicate
 			{
 				if (g_syscall(G_ARGC) > 2)
 				{
@@ -246,7 +246,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 						{
 							DispContiguous(user, JASS_VARARGS("^6Description: %s", achievements[i].description));
 							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i].description));
-							achievements_progress(user, achievements[i].id, qtrue);
+							achievements_progress(user, achievements[i].id, qtrue, qtrue);
 						}
 					}
 				}
@@ -315,7 +315,6 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					{
 						g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%s\n^6%s\n\"", x->name, x->description));
 						achievements_progress(user, x->id, qtrue);
-						DispContiguous(user, NULL);
 						JASS_RET_SUPERCEDE(1);
 					}
 
