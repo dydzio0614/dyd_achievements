@@ -707,29 +707,32 @@ void achievements_check(gentity_t *user, dyd_achievement *x, qboolean print) //a
 
 
 
-void achievements_list(gentity_t *user, enum dyd_achievement_types type, qboolean extended) //this does NOT handle "claimable" category
+void achievements_list(gentity_t *user, enum dyd_achievement_types type, qboolean extended, qboolean claimableonly) //this does NOT handle "claimable" category
 {
 	for (int i = 0; i < MAX_ACHIEVEMENTS; i++)
 	{
-		if (achievements[i].type == type)
+		if (( type && achievements[i].type != ACHIEVEMENT_NONE) || achievements[i].type == type)
 		{
-			char* bitmaskValue = Accounts_Custom_GetValue(user->client->pers.Lmd.account, "ACHIEVEMENTS");
-			if (bitmaskValue != NULL && ((unsigned long)strtol(bitmaskValue, NULL, 0) & GetAchievementBitmaskFromID(achievements[i].id))) //checking for completion
+			if (!claimableonly || (claimableonly && achievements[i].autoclaimable == qfalse))
 			{
-				DispContiguous(user, JASS_VARARGS("^2%d. %s ^5%s", achievements[i].id, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)^2 - COMPLETED" : "^2 - COMPLETED"));				
-				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%d. %s ^5%s\"", achievements[i].id, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)\n" : "\n"));
-			}
-			else
-			{
-				DispContiguous(user, JASS_VARARGS("^3%d. %s ^5%s", achievements[i].id, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)" : ""));
-				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2%d. %s ^5%s\"", achievements[i].id, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)^2 - COMPLETED\n" : "^2 - COMPLETED \n"));
-			}
+				char* bitmaskValue = Accounts_Custom_GetValue(user->client->pers.Lmd.account, "ACHIEVEMENTS");
+				if (bitmaskValue != NULL && ((unsigned long)strtol(bitmaskValue, NULL, 0) & GetAchievementBitmaskFromID(achievements[i].id))) //checking for completion
+				{
+					DispContiguous(user, JASS_VARARGS("^2%d. %s ^5%s", achievements[i].id, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)^2 - COMPLETED" : "^2 - COMPLETED"));
+					//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^3%d. %s ^5%s\"", achievements[i].id, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)\n" : "\n"));
+				}
+				else
+				{
+					DispContiguous(user, JASS_VARARGS("^3%d. %s ^5%s", achievements[i].id, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)" : ""));
+					//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^2%d. %s ^5%s\"", achievements[i].id, achievements[i].name, (achievements[i].autoclaimable == qfalse) ? "(claimable)^2 - COMPLETED\n" : "^2 - COMPLETED \n"));
+				}
 
-			if (extended == qtrue)
-			{
-				DispContiguous(user, JASS_VARARGS("^6Description: %s", achievements[i].description));
-				//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i].description));
-				achievements_progress(user, achievements[i].id, qtrue, qtrue);
+				if (extended == qtrue)
+				{
+					DispContiguous(user, JASS_VARARGS("^6Description: %s", achievements[i].description));
+					//g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i].description));
+					achievements_progress(user, achievements[i].id, qtrue, qtrue);
+				}
 			}
 		}
 	}

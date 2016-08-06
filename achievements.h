@@ -59,7 +59,7 @@ struct dyd_playerdata
 //headers of achievement management functions
 void achievements_init();
 void achievements_check(gentity_t*, dyd_achievement*, qboolean);
-void achievements_list(gentity_t*, enum dyd_achievement_types, qboolean);
+void achievements_list(gentity_t*, enum dyd_achievement_types, qboolean, qboolean);
 int achievements_progress(gentity_t*, enum dyd_achievement_identifiers, qboolean, qboolean);
 int achievements_progress(gentity_t*, enum dyd_achievement_identifiers, qboolean);
 

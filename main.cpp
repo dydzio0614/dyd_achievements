@@ -155,12 +155,12 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					g_syscall(G_ARGV, 2, arg, sizeof(arg));
 					if (!stricmp(arg, "ext"))
 					{
-						achievements_list(user, ACHIEVEMENT_FIGHT, qtrue);
+						achievements_list(user, ACHIEVEMENT_FIGHT, qtrue, qfalse);
 						JASS_RET_SUPERCEDE(1);
 					}
 				}
 
-				achievements_list(user, ACHIEVEMENT_FIGHT, qfalse);
+				achievements_list(user, ACHIEVEMENT_FIGHT, qfalse, qfalse);
 
 				JASS_RET_SUPERCEDE(1);
 			}
@@ -173,12 +173,12 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					g_syscall(G_ARGV, 2, arg, sizeof(arg));
 					if (!stricmp(arg, "ext"))
 					{
-						achievements_list(user, ACHIEVEMENT_DUELS, qtrue);
+						achievements_list(user, ACHIEVEMENT_DUELS, qtrue, qfalse);
 						JASS_RET_SUPERCEDE(1);
 					}
 				}
 
-				achievements_list(user, ACHIEVEMENT_DUELS, qfalse);
+				achievements_list(user, ACHIEVEMENT_DUELS, qfalse, qfalse);
 
 				JASS_RET_SUPERCEDE(1);
 			}
@@ -191,12 +191,12 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					g_syscall(G_ARGV, 2, arg, sizeof(arg));
 					if (!stricmp(arg, "ext"))
 					{
-						achievements_list(user, ACHIEVEMENT_MISC, qtrue);
+						achievements_list(user, ACHIEVEMENT_MISC, qtrue, qfalse);
 						JASS_RET_SUPERCEDE(1);
 					}
 				}
 
-				achievements_list(user, ACHIEVEMENT_MISC, qfalse);
+				achievements_list(user, ACHIEVEMENT_MISC, qfalse, qfalse);
 
 				JASS_RET_SUPERCEDE(1);
 			}
@@ -209,48 +209,29 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					g_syscall(G_ARGV, 2, arg, sizeof(arg));
 					if (!stricmp(arg, "ext"))
 					{
-						achievements_list(user, ACHIEVEMENT_HELPER, qtrue);
+						achievements_list(user, ACHIEVEMENT_HELPER, qtrue, qfalse);
 						JASS_RET_SUPERCEDE(1);
 					}
 				}
 
-				achievements_list(user, ACHIEVEMENT_HELPER, qfalse);
+				achievements_list(user, ACHIEVEMENT_HELPER, qfalse, qfalse);
 
 				JASS_RET_SUPERCEDE(1);
 			}
 
-			else if (!stricmp(arg, "claimable")) //logic separated from achievements_list() but similar, TODO: try to refactor to avoid code duplicate
+			else if (!stricmp(arg, "claimable"))
 			{
+				char arg[16];
 				if (g_syscall(G_ARGC) > 2)
 				{
 					g_syscall(G_ARGV, 2, arg, sizeof(arg));
-				}
-
-				for (int i = 0; i < MAX_ACHIEVEMENTS; i++)
-				{
-					if (achievements[i].autoclaimable == qfalse)
+					if (!stricmp(arg, "ext"))
 					{
-						char* bitmaskValue = Accounts_Custom_GetValue(user->client->pers.Lmd.account, "ACHIEVEMENTS");
-						if (bitmaskValue != NULL && ((unsigned long)strtol(bitmaskValue, NULL, 0) & GetAchievementBitmaskFromID(achievements[i].id))) //checking for completion
-						{
-							DispContiguous(user, JASS_VARARGS("^2%d. %s - COMPLETED", achievements[i].id, achievements[i].name));
-							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^3%d. %s\n\"", achievements[i].id, achievements[i].name));
-						}
-						else
-						{
-							DispContiguous(user, JASS_VARARGS("^3%d. %s", achievements[i].id, achievements[i].name));
-							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^2%d. %s - COMPLETED\n\"", achievements[i].id, achievements[i].name));
-						}
-
-						if (!stricmp(arg, "ext"))
-						{
-							DispContiguous(user, JASS_VARARGS("^6Description: %s", achievements[i].description));
-							//g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^6Description: %s\n\"", achievements[i].description));
-							achievements_progress(user, achievements[i].id, qtrue, qtrue);
-						}
+						achievements_list(user, ACHIEVEMENT_NONE, qtrue, qtrue);
+						JASS_RET_SUPERCEDE(1);
 					}
 				}
-				DispContiguous(user, NULL);
+				achievements_list(user, ACHIEVEMENT_NONE, qfalse, qtrue);
 				JASS_RET_SUPERCEDE(1);				
 			}
 				
