@@ -312,7 +312,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[2].reward_credits = 25000;
 	sprintf(achievements[2].description, "Kill 1000 players. Reward: %d credits", achievements[2].reward_credits);
 	achievements[2].autoclaimable = qtrue;
-	achievements[2].progressVariable.varName = "kills"; achievements[2].progressVariable.counter = 1000; achievements[2].progressVariable.GetStatFunction = Accounts_Stats_GetKills;
+	achievements[2].progressVariable.varName = "kills"; achievements[2].progressVariable.counter = 1000; achievements[2].progressVariable.GetStatFunction = Accounts_Stats_GetPlayerKills;
 
 	achievements[3].type = ACHIEVEMENT_FIGHT;
 	achievements[3].id = A_FIGHT_PKILL2;
@@ -320,7 +320,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[3].reward_credits = 100000;
 	sprintf(achievements[3].description, "Kill 5000 players. Reward: %d credits", achievements[3].reward_credits);
 	achievements[3].autoclaimable = qtrue;
-	achievements[3].progressVariable.varName = "kills"; achievements[3].progressVariable.counter = 5000; achievements[3].progressVariable.GetStatFunction = Accounts_Stats_GetKills;
+	achievements[3].progressVariable.varName = "kills"; achievements[3].progressVariable.counter = 5000; achievements[3].progressVariable.GetStatFunction = Accounts_Stats_GetPlayerKills;
 
 	achievements[4].type = ACHIEVEMENT_FIGHT;
 	achievements[4].id = A_FIGHT_PKILL3;
@@ -328,7 +328,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[4].reward_credits = 160000;
 	sprintf(achievements[4].description, "Kill 10000 players. Reward: (hidden)");
 	achievements[4].autoclaimable = qtrue;
-	achievements[4].progressVariable.varName = "kills"; achievements[4].progressVariable.counter = 10000; achievements[4].progressVariable.GetStatFunction = Accounts_Stats_GetKills;
+	achievements[4].progressVariable.varName = "kills"; achievements[4].progressVariable.counter = 10000; achievements[4].progressVariable.GetStatFunction = Accounts_Stats_GetPlayerKills;
 
 	achievements[5].type = ACHIEVEMENT_DUELS;
 	achievements[5].id = A_DUELS_ENGAGE1;
