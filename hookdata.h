@@ -24,7 +24,8 @@ extern void(*Accounts_Custom_SetValue)(Account_t* acc, const char *key, const ch
 extern int(*ClientNumberFromString)(gentity_t* to, const char* s); //as name says
 extern gentity_t* (*GetEnt)(int index); //return entity struct for entity with proper index
 extern void (*DispContiguous)(gentity_t* ent, const char* msg); //add string to specific buffer - syscall SEND_SERVER_COMMAND print if msg NULL or buffer size exceeds 1024
-
+extern int(*Auths_GetPlayerRank)(gentity_t *ent);
+extern Account_t* (*Accounts_GetByUsername)(const char* str);
 
 extern int(*Accounts_Stats_GetKills)(Account_t *acc);
 extern int(*Accounts_Stats_GetDeaths)(Account_t *acc);

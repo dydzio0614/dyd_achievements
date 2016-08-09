@@ -3,7 +3,7 @@
 #pragma warning (disable: 4996)
 
 //plugin info
-plugininfo_t g_plugininfo = { "dydplugin", "1.2", "Lugormod U# 2.4.9 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR }; //when changing version, update /achievements help version too
+plugininfo_t g_plugininfo = { "dydplugin", "1.2.1", "Lugormod U# 2.4.9 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR }; //when changing version, update /achievements help version too
 pluginres_t* g_result = NULL;
 eng_syscall_t g_syscall = NULL;
 mod_vmMain_t g_vmMain = NULL;
@@ -59,6 +59,60 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 		g_syscall(G_ARGV, 0, command, sizeof(command)); //getting cmd
 
 		//flavor commands
+
+		if (!stricmp(command, "removeachievementfromacc") && acc)
+		{
+			if (Auths_GetPlayerRank(user) == 1)
+			{
+				if (g_syscall(G_ARGC) > 2)
+				{
+					char arg1[40];
+					char arg2[16];
+					g_syscall(G_ARGV, 1, arg1, sizeof(arg1));
+					g_syscall(G_ARGV, 2, arg2, sizeof(arg2));
+					Account_t* targetAccount = Accounts_GetByUsername(arg1);
+					if (targetAccount != NULL)
+					{
+						int ID = strtol(arg2, NULL, 0);
+						if (ID)
+						{
+							dyd_achievement *achievementToRemove = FindAchievementById(ID);
+							if (achievementToRemove != NULL)
+							{
+								char* bitmaskValue = Accounts_Custom_GetValue(targetAccount, "ACHIEVEMENTS");
+								if (bitmaskValue != NULL && (unsigned long)strtol(bitmaskValue, NULL, 0) & GetAchievementBitmaskFromID(ID))
+								{
+									if (targetAccount->credits >= achievementToRemove->reward_credits) //WRESZCIE
+									{
+										targetAccount->credits -= achievementToRemove->reward_credits;
+										targetAccount->modifiedTime = g_level->time;
+										unsigned long newBitmask = (unsigned long)strtol(bitmaskValue, NULL, 0) & ~(GetAchievementBitmaskFromID(ID));
+										Accounts_Custom_SetValue(targetAccount, "ACHIEVEMENTS", JASS_VARARGS("%lu", newBitmask));
+										g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1Achievement removed from account.\n\"");
+									}
+									else
+										g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1Insufficient credits on target account to revert achievement.\n\"");
+
+								}
+								else
+									g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1Player did not complete mentioned achievement.\n\"");
+							}
+							else
+								g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1Wrong achievement ID.\n\"");							
+						}
+						else
+							g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1Wrong achievement ID.\n\"");
+					}
+					else
+						g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1Account not found.\n\"");
+				}
+				else
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1Usage: removeachievementfromacc (username) (achievement ID).\n\"");
+
+				JASS_RET_SUPERCEDE(1);
+			}
+			JASS_RET_IGNORED(1);
+		}
 
 		if (!stricmp(command, "saberbarrier") && acc)
 		{
@@ -349,7 +403,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				
 			else if (!stricmp(arg, "help")) //end of categories
 			{
-				DispContiguous(user, "^6Lugormod achievement system by ^0Dyd^1zio^6, version 1.2");
+				DispContiguous(user, "^6Lugormod achievement system by ^0Dyd^1zio^6, version 1.2.1");
 				DispContiguous(user, "^5It allows two possible kinds of achievements: Claimable achievements, where player must force completion manually, and automatic achievements, where completion and reward are autogranted.");
 				DispContiguous(user, "^5Achievements are assigned to categories, what becomes helpful if number of achievements is large. Special category \'claimable\' shows claimable achievements from all other categories.");
 				DispContiguous(user, "^3Possible syntax: \nachievements <category> - displays achievements from category.");

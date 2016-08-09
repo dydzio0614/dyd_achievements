@@ -8,6 +8,8 @@ void(*Accounts_Custom_SetValue)(Account_t* acc, const char *key, const char *val
 int(*ClientNumberFromString)(gentity_t* to, const char* s) = (int(*)(gentity_t*, const char*))CLIENTNUMFROMSTRING; //as name says
 gentity_t* (*GetEnt)(int index) = (gentity_t*(*)(int))GETENT; //return entity struct for entity with proper index
 void(*DispContiguous)(gentity_t* ent, const char* msg) = (void(*)(gentity_t*, const char*))DISPCONTIGUOUS;
+int(*Auths_GetPlayerRank)(gentity_t *ent) = (int(*)(gentity_t*))GETPLAYERRANK;
+Account_t* (*Accounts_GetByUsername)(const char* str) = (Account_t*(*)(const char*))GETBYUSERNAME;
 
 int(*Accounts_Stats_GetKills)(Account_t *acc) = (int(*)(Account_t*))STATS_GETKILLS;
 int(*Accounts_Stats_GetDeaths)(Account_t *acc) = (int(*)(Account_t*))STATS_GETDEATHS;
