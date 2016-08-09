@@ -54,31 +54,22 @@ int achievements_progress(gentity_t *user, dyd_achievement_identifiers x, qboole
 	{
 		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
 		int wins = Accounts_Stats_GetDuelsWon(user->client->pers.Lmd.account);
+		int conditionsMet = (duels >= 3000 && wins >= 1500);
 
-		if (duels >= 3000 && wins >= 1500)
+		if (print == qtrue)
 		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/3000 duels, %d/1500 duels won - you finished the goal", duels, wins);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
+			char *msg;
+			if(conditionsMet)
+				msg = JASS_VARARGS("^2Your current progress of the achievement: %d/3000 duels, %d/1500 duels won - you finished the goal", duels, wins);
+			else
+				msg = JASS_VARARGS("^3Your current progress of the achievement: %d/3000 duels, %d/1500 duels won", duels, wins);
+
+			if (delayprint == qtrue)
+				DispContiguous(user, msg);
+			else
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
 		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/3000 duels, %d/1500 duels won", duels, wins);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
+		return conditionsMet;
 	}
 
 	else if (x == A_DUELS_DRATIO1)
@@ -90,34 +81,29 @@ int achievements_progress(gentity_t *user, dyd_achievement_identifiers x, qboole
 		if ( (duels - wins) != 0) 
 			ratio = (float)wins / (float)(duels - wins);
 
-		if (duels >= 500 && ratio >= 1.0f)
+		int conditionsMet = (duels >= 500 && ratio >= 1.0f);
+
+		if (print == qtrue)
 		{
-			if (print == qtrue)
+			char buf[256];
+			char *msg;
+			if (conditionsMet)
 			{
-				char buf[256];
 				sprintf(buf, "Your current progress of the achievement: %d/500 duels, %.2f duel ratio (1.0 needed) - you finished the goal", duels, (float)ratio);
-				char *msg = JASS_VARARGS("^2%s", buf);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
+				msg = JASS_VARARGS("^2%s", buf);
 			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
+			else
 			{
-				char buf[256];
 				sprintf(buf, "Your current progress of the achievement: %d/500 duels, %.2f duel ratio (1.0 needed)", duels, (float)ratio);
-				char *msg = JASS_VARARGS("^3%s", buf);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
+				msg = JASS_VARARGS("^3%s", buf);
 			}
-			return 0;
+
+			if (delayprint == qtrue)
+				DispContiguous(user, msg);
+			else
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
 		}
+		return conditionsMet;
 	}
 
 	else if (x == A_DUELS_DRATIO2)
@@ -129,34 +115,29 @@ int achievements_progress(gentity_t *user, dyd_achievement_identifiers x, qboole
 		if ((duels - wins) != 0)
 			ratio = (float)wins / (float)(duels - wins);
 
-		if (duels >= 1250 && ratio >= 1.5f)
+		int conditionsMet = (duels >= 1250 && ratio >= 1.5f);
+
+		if (print == qtrue)
 		{
-			if (print == qtrue)
+			char buf[256];
+			char *msg;
+			if (conditionsMet)
 			{
-				char buf[256];
 				sprintf(buf, "Your current progress of the achievement: %d/1250 duels, %.2f duel ratio (1.5 needed) - you finished the goal", duels, (float)ratio);
-				char *msg = JASS_VARARGS("^2%s", buf);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
+				msg = JASS_VARARGS("^2%s", buf);
 			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
+			else
 			{
-				char buf[256];
 				sprintf(buf, "Your current progress of the achievement: %d/1250 duels, %.2f duel ratio (1.5 needed)", duels, (float)ratio);
-				char *msg = JASS_VARARGS("^3%s", buf);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
+				msg = JASS_VARARGS("^3%s", buf);
 			}
-			return 0;
+
+			if (delayprint == qtrue)
+				DispContiguous(user, msg);
+			else
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
 		}
+		return conditionsMet;
 	}
 
 	else if (x == A_DUELS_DRATIO3)
@@ -168,34 +149,29 @@ int achievements_progress(gentity_t *user, dyd_achievement_identifiers x, qboole
 		if ((duels - wins) != 0)
 			ratio = (float)wins / (float)(duels - wins);
 
-		if (duels >= 2500 && ratio >= 2.0f)
+		int conditionsMet = (duels >= 2500 && ratio >= 2.0f);
+
+		if (print == qtrue)
 		{
-			if (print == qtrue)
+			char buf[256];
+			char *msg;
+			if (conditionsMet)
 			{
-				char buf[256];
 				sprintf(buf, "Your current progress of the achievement: %d/2500 duels, %.2f duel ratio (2.0 needed) - you finished the goal", duels, (float)ratio);
-				char *msg = JASS_VARARGS("^2%s", buf);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
+				msg = JASS_VARARGS("^2%s", buf);
 			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
+			else
 			{
-				char buf[256];
 				sprintf(buf, "Your current progress of the achievement: %d/2500 duels, %.2f duel ratio (2.0 needed)", duels, (float)ratio);
-				char *msg = JASS_VARARGS("^3%s", buf);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
+				msg = JASS_VARARGS("^3%s", buf);
 			}
-			return 0;
+
+			if (delayprint == qtrue)
+				DispContiguous(user, msg);
+			else
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
 		}
+		return conditionsMet;
 	}
 
 	else return -1; //achievement not found by identifier
