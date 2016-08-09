@@ -64,6 +64,7 @@ struct dyd_playerdata
 	int saberbarrier_cooldown[MAX_CLIENTS];
 	int weapon_on_death[MAX_CLIENTS];
 	int mentalshield_cooldown[MAX_CLIENTS];
+	int bladetornado_cooldown[MAX_CLIENTS];
 };
 
 

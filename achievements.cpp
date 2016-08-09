@@ -250,7 +250,7 @@ void achievements_list(gentity_t *user, enum dyd_achievement_types type, qboolea
 {
 	for (int i = 0; i < MAX_ACHIEVEMENTS; i++)
 	{
-		if (( type && achievements[i].type != ACHIEVEMENT_NONE) || achievements[i].type == type)
+		if (( type == 0 && achievements[i].type != ACHIEVEMENT_NONE) || achievements[i].type == type)
 		{
 			if (!claimableonly || (claimableonly && achievements[i].autoclaimable == qfalse))
 			{
@@ -294,7 +294,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[0].id = A_MISC_PLAYTIME1;
 	achievements[0].name = "Loyal player";
 	achievements[0].reward_credits = 20000;
-	sprintf(achievements[0].description, "Spend 25 hours total on the server. You can check total time spent using /stats command. Reward: %d credits", achievements[0].reward_credits);
+	sprintf(achievements[0].description, "Spend 25 hours total on the server. Reward: %d credits", achievements[0].reward_credits);
 	achievements[0].autoclaimable = qfalse;
 	achievements[0].progressVariable.varName = "hours"; achievements[0].progressVariable.counter = 25; achievements[0].progressVariable.GetStatFunction = Accounts_Stats_GetHoursPlayed;
 
@@ -302,7 +302,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[1].id = A_MISC_PLAYTIME2;
 	achievements[1].name = "Follower";
 	achievements[1].reward_credits = 90000;
-	sprintf(achievements[1].description, "Spend 100 hours total on the server. You can check total time spent using /stats command. Reward: %d credits", achievements[1].reward_credits);
+	sprintf(achievements[1].description, "Spend 100 hours total on the server. Reward: %d credits", achievements[1].reward_credits);
 	achievements[1].autoclaimable = qfalse;
 	achievements[1].progressVariable.varName = "hours"; achievements[1].progressVariable.counter = 100; achievements[1].progressVariable.GetStatFunction = Accounts_Stats_GetHoursPlayed;
 
@@ -391,7 +391,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[13].type = ACHIEVEMENT_FIGHT;
 	achievements[13].id = A_FIGHT_SELFSHOT1;
 	achievements[13].name = "Brainless shooter";
-	achievements[13].reward_credits = 20000;
+	achievements[13].reward_credits = 25000;
 	sprintf(achievements[13].description, "Die 100 times from your own non-splash bullet. This achievement is not something to be proud of. Reward: %d credits.", achievements[13].reward_credits);
 	achievements[13].autoclaimable = qtrue;
 	achievements[13].progressVariable.varName = "suicidal shots"; achievements[13].progressVariable.counter = 100; achievements[13].progressVariable.GetStatFunction = Accounts_Stats_GetSelfshots;
@@ -463,15 +463,15 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[22].type = ACHIEVEMENT_LEGENDARY;
 	achievements[22].id = A_MISC_PLAYTIME3;
 	achievements[22].name = "Loyal to death";
-	achievements[22].reward_credits = 100000;
-	sprintf(achievements[22].description, "Spend 600 hours total on the server. You can check total time spent using /stats command. Reward: %d credits. You unlock /mentalshield command that protects player from taking damage for 3 seconds.", achievements[22].reward_credits);
+	achievements[22].reward_credits = 150000;
+	sprintf(achievements[22].description, "Spend 600 hours total on the server. Reward: %d credits. You unlock /mentalshield command that protects player from taking damage for 3 seconds.", achievements[22].reward_credits);
 	achievements[22].autoclaimable = qfalse;
 	achievements[22].progressVariable.varName = "hours"; achievements[22].progressVariable.counter = 600; achievements[22].progressVariable.GetStatFunction = Accounts_Stats_GetHoursPlayed;
 
 	achievements[23].type = ACHIEVEMENT_LEGENDARY;
 	achievements[23].id = A_DUELS_ENGAGE4;
 	achievements[23].name = "Saber god";
-	achievements[23].reward_credits = 100000;
+	achievements[23].reward_credits = 160000;
 	sprintf(achievements[23].description, "Play 7500 saber duels and win at least 5000 duels total. Reward: %d credits. You are allowed to perform special attack with any saber type while standing still with 60 seconds cooldown (/bladetornado command)", achievements[23].reward_credits);
 	achievements[23].autoclaimable = qfalse;
 
