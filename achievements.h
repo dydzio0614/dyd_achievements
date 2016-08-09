@@ -47,6 +47,13 @@ struct dyd_achievement
 	char description[256]; //description to display in console
 	int reward_credits;
 	qboolean autoclaimable;
+
+	struct //holds variable data for achievements that depend of reaching certain amount of one data, should be NULL for achievements not using this feature
+	{
+		char* varName; //variable name to display in print
+		int counter; //value required to unlock achievement - int should suffice for now
+		int(*GetStatFunction)(Account_t*); //function pointer to check current stat progress
+	}progressVariable;
 };
 
 struct dyd_playerdata

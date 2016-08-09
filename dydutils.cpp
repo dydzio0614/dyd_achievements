@@ -104,3 +104,12 @@ void Accounts_Stats_SetPistolDuelWins(Account_t *acc, int value)
 		Accounts_Custom_SetValue(acc, "A_DATA_PWINS", data);
 	}
 }
+
+int Accounts_Stats_GetHoursPlayed(Account_t *acc)
+{
+	if (acc)
+	{
+		return (acc->time / 3600);
+	}
+	else return 0;
+}

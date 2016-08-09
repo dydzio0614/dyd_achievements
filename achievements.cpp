@@ -25,214 +25,29 @@ long GetAchievementBitmaskFromID(long ID)
 
 int achievements_progress(gentity_t *user, dyd_achievement_identifiers x, qboolean print, qboolean delayprint) //check progress, can be used in unlock to check requirements, can be used to display progress, use delayprint to reduce output frequency by holding data in buffer waiting for dispcontiguous to be called externally
 {
-	if (x == A_MISC_PLAYTIME1)
+	dyd_achievement *achievementToCheck = FindAchievementById(x);
+
+	if (achievementToCheck->progressVariable.varName != NULL) //code logic for achievements with 1 completion variable
 	{
-		int time = user->client->pers.Lmd.account->time; //seconds
-		int hours = time / 3600;
-		if (time >= 90000)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement : %d / 25 hours - you finished the goal", hours);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/25 hours", hours);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
+		int progressVariable = achievementToCheck->progressVariable.GetStatFunction(user->client->pers.Lmd.account);
+		int conditionsMet = (progressVariable >= achievementToCheck->progressVariable.counter);
 
-	else if (x == A_MISC_PLAYTIME2)
-	{
-		int time = user->client->pers.Lmd.account->time; //seconds
-		int hours = time / 3600;
-		if (time >= 360000)
+		if (print == qtrue)
 		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/100 hours - you finished the goal", hours);
-				if(delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/100 hours", hours);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
+			char *msg;
+			if(conditionsMet)
+				msg = JASS_VARARGS("^2Your current progress of the achievement: %d/%d %s - you finished the goal",
+					progressVariable, achievementToCheck->progressVariable.counter, achievementToCheck->progressVariable.varName);
+			else
+				msg = JASS_VARARGS("^3Your current progress of the achievement: %d/%d %s",
+					progressVariable, achievementToCheck->progressVariable.counter, achievementToCheck->progressVariable.varName);
 
-	else if (x == A_FIGHT_PKILL1)
-	{
-		int kills = Accounts_Stats_GetPlayerKills(user->client->pers.Lmd.account); //seconds
-																				   //int deaths = Accounts_Stats_GetPlayerDefeats(user->client->pers.Lmd.account); //in case we want to show kill / death ratio
-		if (kills >= 1000)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/1000 kills - you finished the goal", kills);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
+			if (delayprint == qtrue)
+				DispContiguous(user, msg);
+			else
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
 		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/1000 kills", kills);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
-
-	else if (x == A_FIGHT_PKILL2)
-	{
-		int kills = Accounts_Stats_GetPlayerKills(user->client->pers.Lmd.account); //seconds
-																				   //int deaths = Accounts_Stats_GetPlayerDefeats(user->client->pers.Lmd.account); //in case we want to show kill / death ratio
-		if (kills >= 5000)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/5000 kills - you finished the goal", kills);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/5000 kills", kills);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
-
-	else if (x == A_FIGHT_PKILL3)
-	{
-		int kills = Accounts_Stats_GetPlayerKills(user->client->pers.Lmd.account); //seconds
-																				   //int deaths = Accounts_Stats_GetPlayerDefeats(user->client->pers.Lmd.account); //in case we want to show kill / death ratio
-		if (kills >= 10000)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/10000 kills - you finished the goal", kills);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/10000 kills", kills);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
-
-	else if (x == A_DUELS_ENGAGE1)
-	{
-		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
-
-		if (duels >= 500)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/500 duels - you finished the goal", duels);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/500 duels", duels);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
-
-	else if (x == A_DUELS_ENGAGE2)
-	{
-		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
-
-		if (duels >= 1500)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/1500 duels - you finished the goal", duels);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/1500 duels", duels);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
+		return conditionsMet;
 	}
 
 	else if (x == A_DUELS_ENGAGE3)
@@ -383,281 +198,7 @@ int achievements_progress(gentity_t *user, dyd_achievement_identifiers x, qboole
 		}
 	}
 
-	else if (x == A_FIGHT_SELFSHOT1)
-	{
-		int selfshots = Accounts_Stats_GetSelfshots(user->client->pers.Lmd.account); 
-																					
-		if (selfshots >= 100)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/100 suicidal shots - you finished the goal", selfshots);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/100 suicidal shots", selfshots);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
-
-	else if (x == A_FIGHT_AMMO1)
-	{
-		int ammo = Accounts_Stats_GetShots(user->client->pers.Lmd.account);
-		
-		if (ammo >= 20000)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/20000 ammo fired - you finished the goal", ammo);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/20000 ammo fired", ammo);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
-
-	else if (x == A_FIGHT_AMMO2)
-	{
-		int ammo = Accounts_Stats_GetShots(user->client->pers.Lmd.account);
-
-		if (ammo >= 50000)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/50000 ammo fired - you finished the goal", ammo);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/50000 ammo fired", ammo);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
-
-	else if (x == A_FIGHT_AMMO3)
-	{
-		int ammo = Accounts_Stats_GetShots(user->client->pers.Lmd.account);
-
-		if (ammo >= 150000)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/150000 ammo fired - you finished the goal", ammo);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/150000 ammo fired", ammo);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
-
-	else if (x == A_MISC_STASH1)
-	{
-		int stashes = Accounts_Stats_GetStashes(user->client->pers.Lmd.account);
-
-		if (stashes >= 50)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/50 stashes - you finished the goal", stashes);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/50 stashes", stashes);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
-
-	else if (x == A_MISC_STASH2)
-	{
-		int stashes = Accounts_Stats_GetStashes(user->client->pers.Lmd.account);
-
-		if (stashes >= 200)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/200 stashes - you finished the goal", stashes);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/200 stashes", stashes);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
-
-	else if (x == A_DUELS_PISTOL1)
-	{
-		int pistol_duels = Accounts_Stats_GetPistolDuels(user->client->pers.Lmd.account);
-
-		if (pistol_duels >= 250)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/250 pistol duels - you finished the goal", pistol_duels);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/250 pistol duels", pistol_duels);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
-
-	else if (x == A_DUELS_PISTOL2)
-	{
-		int pistol_duels = Accounts_Stats_GetPistolDuels(user->client->pers.Lmd.account);
-
-		if (pistol_duels >= 750)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/750 pistol duels - you finished the goal", pistol_duels);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/750 pistol duels", pistol_duels);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
-
-	else if (x == A_DUELS_PISTOL3)
-	{
-		int pistol_duels = Accounts_Stats_GetPistolDuels(user->client->pers.Lmd.account);
-
-		if (pistol_duels >= 1500)
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^2Your current progress of the achievement: %d/1500 pistol duels - you finished the goal", pistol_duels);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 1;
-		}
-		else
-		{
-			if (print == qtrue)
-			{
-				char *msg = JASS_VARARGS("^3Your current progress of the achievement: %d/1500 pistol duels", pistol_duels);
-				if (delayprint == qtrue)
-					DispContiguous(user, msg);
-				else
-					g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
-			}
-			return 0;
-		}
-	}
 	else return -1; //achievement not found by identifier
-
-
 }
 
 int achievements_progress(gentity_t *user, dyd_achievement_identifiers x, qboolean print)
@@ -757,6 +298,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[0].reward_credits = 20000;
 	sprintf(achievements[0].description, "Spend 25 hours total on the server. You can check total time spent using /stats command. Reward: %d credits", achievements[0].reward_credits);
 	achievements[0].autoclaimable = qfalse;
+	achievements[0].progressVariable.varName = "hours"; achievements[0].progressVariable.counter = 25; achievements[0].progressVariable.GetStatFunction = Accounts_Stats_GetHoursPlayed;
 
 	achievements[1].type = ACHIEVEMENT_MISC;
 	achievements[1].id = A_MISC_PLAYTIME2;
@@ -764,6 +306,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[1].reward_credits = 90000;
 	sprintf(achievements[1].description, "Spend 100 hours total on the server. You can check total time spent using /stats command. Reward: %d credits", achievements[1].reward_credits);
 	achievements[1].autoclaimable = qfalse;
+	achievements[1].progressVariable.varName = "hours"; achievements[1].progressVariable.counter = 100; achievements[1].progressVariable.GetStatFunction = Accounts_Stats_GetHoursPlayed;
 
 	achievements[2].type = ACHIEVEMENT_FIGHT;
 	achievements[2].id = A_FIGHT_PKILL1;
@@ -771,6 +314,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[2].reward_credits = 25000;
 	sprintf(achievements[2].description, "Kill 1000 players. Reward: %d credits", achievements[2].reward_credits);
 	achievements[2].autoclaimable = qtrue;
+	achievements[2].progressVariable.varName = "kills"; achievements[2].progressVariable.counter = 1000; achievements[2].progressVariable.GetStatFunction = Accounts_Stats_GetKills;
 
 	achievements[3].type = ACHIEVEMENT_FIGHT;
 	achievements[3].id = A_FIGHT_PKILL2;
@@ -778,6 +322,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[3].reward_credits = 100000;
 	sprintf(achievements[3].description, "Kill 5000 players. Reward: %d credits", achievements[3].reward_credits);
 	achievements[3].autoclaimable = qtrue;
+	achievements[3].progressVariable.varName = "kills"; achievements[3].progressVariable.counter = 5000; achievements[3].progressVariable.GetStatFunction = Accounts_Stats_GetKills;
 
 	achievements[4].type = ACHIEVEMENT_FIGHT;
 	achievements[4].id = A_FIGHT_PKILL3;
@@ -785,6 +330,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[4].reward_credits = 160000;
 	sprintf(achievements[4].description, "Kill 10000 players. Reward: (hidden)");
 	achievements[4].autoclaimable = qtrue;
+	achievements[4].progressVariable.varName = "kills"; achievements[4].progressVariable.counter = 10000; achievements[4].progressVariable.GetStatFunction = Accounts_Stats_GetKills;
 
 	achievements[5].type = ACHIEVEMENT_DUELS;
 	achievements[5].id = A_DUELS_ENGAGE1;
@@ -792,6 +338,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[5].reward_credits = 25000;
 	sprintf(achievements[5].description, "Play 500 saber duels. Reward: %d credits.", achievements[5].reward_credits);
 	achievements[5].autoclaimable = qfalse;
+	achievements[5].progressVariable.varName = "duels"; achievements[5].progressVariable.counter = 500; achievements[5].progressVariable.GetStatFunction = Accounts_Stats_GetDuels;
 
 	achievements[6].type = ACHIEVEMENT_DUELS;
 	achievements[6].id = A_DUELS_ENGAGE2;
@@ -799,6 +346,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[6].reward_credits = 60000;
 	sprintf(achievements[6].description, "Play 1500 saber duels. Reward: %d credits.", achievements[6].reward_credits);
 	achievements[6].autoclaimable = qfalse;
+	achievements[6].progressVariable.varName = "duels"; achievements[6].progressVariable.counter = 1500; achievements[6].progressVariable.GetStatFunction = Accounts_Stats_GetDuels;
 
 	achievements[7].type = ACHIEVEMENT_DUELS;
 	achievements[7].id = A_DUELS_ENGAGE3;
@@ -848,6 +396,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[13].reward_credits = 10000;
 	sprintf(achievements[13].description, "Die 100 times from your own non-splash bullet. This achievement is not something to be proud of. Reward: %d credits.", achievements[13].reward_credits);
 	achievements[13].autoclaimable = qtrue;
+	achievements[13].progressVariable.varName = "suicidal shots"; achievements[13].progressVariable.counter = 100; achievements[13].progressVariable.GetStatFunction = Accounts_Stats_GetSelfshots;
 
 	achievements[14].type = ACHIEVEMENT_FIGHT;
 	achievements[14].id = A_FIGHT_AMMO1;
@@ -855,6 +404,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[14].reward_credits = 5000;
 	sprintf(achievements[14].description, "Fire 20000 bullets. Reward: %d credits.", achievements[14].reward_credits);
 	achievements[14].autoclaimable = qfalse;
+	achievements[14].progressVariable.varName = "ammo fired"; achievements[14].progressVariable.counter = 20000; achievements[14].progressVariable.GetStatFunction = Accounts_Stats_GetShots;
 
 	achievements[15].type = ACHIEVEMENT_FIGHT;
 	achievements[15].id = A_FIGHT_AMMO2;
@@ -862,6 +412,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[15].reward_credits = 15000;
 	sprintf(achievements[15].description, "Fire 50000 bullets. Reward: %d credits.", achievements[15].reward_credits);
 	achievements[15].autoclaimable = qfalse;
+	achievements[15].progressVariable.varName = "ammo fired"; achievements[15].progressVariable.counter = 50000; achievements[15].progressVariable.GetStatFunction = Accounts_Stats_GetShots;
 
 	achievements[16].type = ACHIEVEMENT_FIGHT;
 	achievements[16].id = A_FIGHT_AMMO3;
@@ -869,6 +420,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[16].reward_credits = 40000;
 	sprintf(achievements[16].description, "Fire 150000 bullets. Reward: %d credits.", achievements[16].reward_credits);
 	achievements[16].autoclaimable = qfalse;
+	achievements[16].progressVariable.varName = "ammo fired"; achievements[16].progressVariable.counter = 150000; achievements[16].progressVariable.GetStatFunction = Accounts_Stats_GetShots;
 
 	achievements[17].type = ACHIEVEMENT_MISC;
 	achievements[17].id = A_MISC_STASH1;
@@ -876,6 +428,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[17].reward_credits = 5000;
 	sprintf(achievements[17].description, "Find and deposit 50 stashes. Reward: %d credits.", achievements[17].reward_credits);
 	achievements[17].autoclaimable = qfalse;
+	achievements[17].progressVariable.varName = "stashes"; achievements[17].progressVariable.counter = 50; achievements[17].progressVariable.GetStatFunction = Accounts_Stats_GetStashes;
 
 	achievements[18].type = ACHIEVEMENT_MISC;
 	achievements[18].id = A_MISC_STASH2;
@@ -883,6 +436,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[18].reward_credits = 35000;
 	sprintf(achievements[18].description, "Find and deposit 200 stashes. Reward: %d credits.", achievements[18].reward_credits);
 	achievements[18].autoclaimable = qfalse;
+	achievements[18].progressVariable.varName = "stashes"; achievements[18].progressVariable.counter = 200; achievements[18].progressVariable.GetStatFunction = Accounts_Stats_GetStashes;
 
 	achievements[19].type = ACHIEVEMENT_DUELS;
 	achievements[19].id = A_DUELS_PISTOL1;
@@ -890,6 +444,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[19].reward_credits = 20000;
 	sprintf(achievements[19].description, "Win 250 blaster pistol duels with another player. Reward: %d credits.", achievements[19].reward_credits);
 	achievements[19].autoclaimable = qtrue;
+	achievements[19].progressVariable.varName = "pistol duels"; achievements[19].progressVariable.counter = 250; achievements[19].progressVariable.GetStatFunction = Accounts_Stats_GetPistolDuelWins;
 
 	achievements[20].type = ACHIEVEMENT_DUELS;
 	achievements[20].id = A_DUELS_PISTOL2;
@@ -897,6 +452,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[20].reward_credits = 45000;
 	sprintf(achievements[20].description, "Win 750 blaster pistol duels against another player. Reward: %d credits.", achievements[20].reward_credits);
 	achievements[20].autoclaimable = qtrue;
+	achievements[20].progressVariable.varName = "pistol duels"; achievements[20].progressVariable.counter = 750; achievements[20].progressVariable.GetStatFunction = Accounts_Stats_GetPistolDuelWins;
 
 	achievements[21].type = ACHIEVEMENT_DUELS;
 	achievements[21].id = A_DUELS_PISTOL3;
@@ -904,4 +460,5 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[21].reward_credits = 75000;
 	sprintf(achievements[21].description, "Win 1500 blaster pistol duels against another player. Reward: %d credits.", achievements[21].reward_credits);
 	achievements[21].autoclaimable = qtrue;
+	achievements[21].progressVariable.varName = "pistol duels"; achievements[21].progressVariable.counter = 1500; achievements[21].progressVariable.GetStatFunction = Accounts_Stats_GetPistolDuelWins;
 }
