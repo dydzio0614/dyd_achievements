@@ -72,6 +72,28 @@ int achievements_progress(gentity_t *user, dyd_achievement_identifiers x, qboole
 		return conditionsMet;
 	}
 
+	else if (x == A_DUELS_ENGAGE4)
+	{
+		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
+		int wins = Accounts_Stats_GetDuelsWon(user->client->pers.Lmd.account);
+		int conditionsMet = (duels >= 7500 && wins >= 5000);
+
+		if (print == qtrue)
+		{
+			char *msg;
+			if (conditionsMet)
+				msg = JASS_VARARGS("^2Your current progress of the achievement: %d/7500 duels, %d/5000 duels won - you finished the goal", duels, wins);
+			else
+				msg = JASS_VARARGS("^3Your current progress of the achievement: %d/7500 duels, %d/5000 duels won", duels, wins);
+
+			if (delayprint == qtrue)
+				DispContiguous(user, msg);
+			else
+				g_syscall(G_SEND_SERVER_COMMAND, user->s.number, JASS_VARARGS("print \"%s\n\"", msg));
+		}
+		return conditionsMet;
+	}
+
 	else if (x == A_DUELS_DRATIO1)
 	{
 		int duels = Accounts_Stats_GetDuels(user->client->pers.Lmd.account);
@@ -369,7 +391,7 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[13].type = ACHIEVEMENT_FIGHT;
 	achievements[13].id = A_FIGHT_SELFSHOT1;
 	achievements[13].name = "Brainless shooter";
-	achievements[13].reward_credits = 10000;
+	achievements[13].reward_credits = 20000;
 	sprintf(achievements[13].description, "Die 100 times from your own non-splash bullet. This achievement is not something to be proud of. Reward: %d credits.", achievements[13].reward_credits);
 	achievements[13].autoclaimable = qtrue;
 	achievements[13].progressVariable.varName = "suicidal shots"; achievements[13].progressVariable.counter = 100; achievements[13].progressVariable.GetStatFunction = Accounts_Stats_GetSelfshots;
@@ -417,15 +439,15 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[19].type = ACHIEVEMENT_DUELS;
 	achievements[19].id = A_DUELS_PISTOL1;
 	achievements[19].name = "Pistol dueler";
-	achievements[19].reward_credits = 20000;
-	sprintf(achievements[19].description, "Win 250 blaster pistol duels with another player. Reward: %d credits.", achievements[19].reward_credits);
+	achievements[19].reward_credits = 30000;
+	sprintf(achievements[19].description, "Win 250 blaster pistol duels against another player. Reward: %d credits.", achievements[19].reward_credits);
 	achievements[19].autoclaimable = qtrue;
 	achievements[19].progressVariable.varName = "pistol duels"; achievements[19].progressVariable.counter = 250; achievements[19].progressVariable.GetStatFunction = Accounts_Stats_GetPistolDuelWins;
 
 	achievements[20].type = ACHIEVEMENT_DUELS;
 	achievements[20].id = A_DUELS_PISTOL2;
 	achievements[20].name = "Precise killer";
-	achievements[20].reward_credits = 45000;
+	achievements[20].reward_credits = 75000;
 	sprintf(achievements[20].description, "Win 750 blaster pistol duels against another player. Reward: %d credits.", achievements[20].reward_credits);
 	achievements[20].autoclaimable = qtrue;
 	achievements[20].progressVariable.varName = "pistol duels"; achievements[20].progressVariable.counter = 750; achievements[20].progressVariable.GetStatFunction = Accounts_Stats_GetPistolDuelWins;
@@ -433,8 +455,24 @@ void achievements_init() //server start achievement allocation, change achieveme
 	achievements[21].type = ACHIEVEMENT_DUELS;
 	achievements[21].id = A_DUELS_PISTOL3;
 	achievements[21].name = "Famous shooter";
-	achievements[21].reward_credits = 75000;
+	achievements[21].reward_credits = 115000;
 	sprintf(achievements[21].description, "Win 1500 blaster pistol duels against another player. Reward: %d credits.", achievements[21].reward_credits);
 	achievements[21].autoclaimable = qtrue;
 	achievements[21].progressVariable.varName = "pistol duels"; achievements[21].progressVariable.counter = 1500; achievements[21].progressVariable.GetStatFunction = Accounts_Stats_GetPistolDuelWins;
+
+	achievements[22].type = ACHIEVEMENT_LEGENDARY;
+	achievements[22].id = A_MISC_PLAYTIME3;
+	achievements[22].name = "Loyal to death";
+	achievements[22].reward_credits = 100000;
+	sprintf(achievements[22].description, "Spend 600 hours total on the server. You can check total time spent using /stats command. Reward: %d credits. You unlock /mentalshield command that protects player from taking damage for 3 seconds.", achievements[22].reward_credits);
+	achievements[22].autoclaimable = qfalse;
+	achievements[22].progressVariable.varName = "hours"; achievements[22].progressVariable.counter = 600; achievements[22].progressVariable.GetStatFunction = Accounts_Stats_GetHoursPlayed;
+
+	achievements[23].type = ACHIEVEMENT_LEGENDARY;
+	achievements[23].id = A_DUELS_ENGAGE4;
+	achievements[23].name = "Saber god";
+	achievements[23].reward_credits = 100000;
+	sprintf(achievements[23].description, "Play 7500 saber duels and win at least 5000 duels total. Reward: %d credits. You are allowed to perform special attack with any saber type while standing still with 60 seconds cooldown (/bladetornado command)", achievements[23].reward_credits);
+	achievements[23].autoclaimable = qfalse;
+
 }

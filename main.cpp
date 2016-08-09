@@ -103,6 +103,99 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 			JASS_RET_IGNORED(1);
 		}
 
+		if (!stricmp(command, "mentalshield") && acc)
+		{
+			char* bitmaskValue = Accounts_Custom_GetValue(user->client->pers.Lmd.account, "ACHIEVEMENTS");
+			if (bitmaskValue != NULL && (unsigned long)strtol(bitmaskValue, NULL, 0) & GetAchievementBitmaskFromID(A_MISC_PLAYTIME3))
+			{
+				if (user->client->sess.spectatorState)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while spectating.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+
+				if (user->client->ps.pm_type == PM_DEAD)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command when you are dead.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+
+				if (user->client->ps.m_iVehicleNum)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while using a vehicle.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+				//add check "if player is busy"
+
+				if ((user->client->ps.fd.forceGripUseTime > g_level->time || user->client->ps.forceHandExtend != HANDEXTEND_NONE
+					|| (user->client->ps.weaponTime > 0) && (!(user->client->Lmd.restrict & 16) || user->client->pers.Lmd.persistantFlags & 16))
+					|| (user->client->ps.weapon != WP_SABER && (user->client->ps.weaponstate == WEAPON_CHARGING || user->client->ps.weaponstate == WEAPON_CHARGING_ALT)))
+					// im aware i shud kill self for dis
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while busy.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+
+				if (g_level->time - dyd_data.mentalshield_cooldown[arg0] > 60000)
+				{
+					dyd_data.mentalshield_cooldown[arg0] = g_level->time;
+					user->client->invulnerableTimer = g_level->time + 3000;
+				}
+				else
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^1You have to wait %d seconds before using this skill again.\n\"", (60000 - (g_level->time - dyd_data.saberbarrier_cooldown[arg0])) / 1000));
+				JASS_RET_SUPERCEDE(1);
+			}
+		}
+
+		if (!stricmp(command, "bladetornado") && acc)
+		{
+			char* bitmaskValue = Accounts_Custom_GetValue(user->client->pers.Lmd.account, "ACHIEVEMENTS");
+			if (bitmaskValue != NULL && (unsigned long)strtol(bitmaskValue, NULL, 0) & GetAchievementBitmaskFromID(A_DUELS_ENGAGE4))
+			{
+				if (user->client->sess.spectatorState)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while spectating.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+
+				if (user->client->ps.pm_type == PM_DEAD)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command when you are dead.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+
+				if (user->client->ps.m_iVehicleNum)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while using a vehicle.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+
+				if (!(user->client->ps.weapon == WP_SABER && user->client->ps.saberHolstered != 2))
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You must have saber up to use this skill.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+
+				if (fabs(user->client->ps.velocity[0]) > 50.0f || fabs(user->client->ps.velocity[1]) > 50.0f || fabs(user->client->ps.velocity[2]) > 50.0f)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You have to stand still when using this skill.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+
+				if (g_level->time - dyd_data.saberbarrier_cooldown[arg0] > 60000)
+				{
+					dyd_data.saberbarrier_cooldown[arg0] = g_level->time;
+					user->client->invulnerableTimer = 0;
+					user->client->ps.saberMove = 58; //change to proper one before release
+					user->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
+				}
+				else
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, JASS_VARARGS("print \"^1You have to wait %d seconds before using this skill again.\n\"", (60000 - (g_level->time - dyd_data.saberbarrier_cooldown[arg0])) / 1000));
+				JASS_RET_SUPERCEDE(1);
+			}
+			JASS_RET_IGNORED(1);
+		}
+
 		/*if (!stricmp(command, "slap"))
 		{
 			char buf[MAX_NETNAME];
@@ -141,7 +234,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 			if (g_syscall(G_ARGC) < 2)
 			{
 				//change to dispcontiguous in future version
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3Usage: achievements <category> - list achievements in category\n^5Available categories:\nFight\nDuels\nMisc\nServerhelper\nClaimable\n^3achievements claim <ID> - claims achievement completion\n^3achievements show <ID> - shows achievement description\n^3achievements help - shows detailed description of achievement system\n^1Remember that all achievements require 20 hours played on account before they can be completed.\n\"");
+				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3Usage: achievements <category> - list achievements in category\n^5Available categories: Fight, Duels, Misc, Serverhelper, Claimable, ^6Legendary\n^3achievements claim <ID> - claims achievement completion\n^3achievements show <ID> - shows achievement description\n^3achievements help - shows detailed description of achievement system\n^1Remember that all achievements require 20 hours played on account before they can be completed.\n\"");
 				JASS_RET_SUPERCEDE(1);
 			}
 
@@ -215,6 +308,24 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				}
 
 				achievements_list(user, ACHIEVEMENT_HELPER, qfalse, qfalse);
+
+				JASS_RET_SUPERCEDE(1);
+			}
+
+			else if (!stricmp(arg, "legendary"))
+			{
+				char arg[16];
+				if (g_syscall(G_ARGC) > 2)
+				{
+					g_syscall(G_ARGV, 2, arg, sizeof(arg));
+					if (!stricmp(arg, "ext"))
+					{
+						achievements_list(user, ACHIEVEMENT_LEGENDARY, qtrue, qfalse);
+						JASS_RET_SUPERCEDE(1);
+					}
+				}
+
+				achievements_list(user, ACHIEVEMENT_LEGENDARY, qfalse, qfalse);
 
 				JASS_RET_SUPERCEDE(1);
 			}
@@ -324,6 +435,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 	{
 		dyd_data.saberbarrier_cooldown[arg0] = 0;
 		dyd_data.weapon_on_death[arg0] = 0;
+		dyd_data.mentalshield_cooldown[arg0] = 0;
 		JASS_RET_IGNORED(1);
 	}
 

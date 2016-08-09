@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include "jassapi.h"
 #include "dydutils.h"
-#define MAX_ACHIEVEMENTS 22
+#define MAX_ACHIEVEMENTS 24
 
 enum dyd_achievement_types
 {
@@ -10,10 +10,11 @@ enum dyd_achievement_types
 	ACHIEVEMENT_FIGHT,
 	ACHIEVEMENT_DUELS,
 	ACHIEVEMENT_MISC,
-	ACHIEVEMENT_HELPER
+	ACHIEVEMENT_HELPER,
+	ACHIEVEMENT_LEGENDARY
 };
 
-enum dyd_achievement_identifiers
+enum dyd_achievement_identifiers //changing enum values will change bitmask order - not desired if trying to maintain compatibility between achievements versions
 {
 	A_MISC_PLAYTIME1 = 1,
 	A_MISC_PLAYTIME2,
@@ -36,7 +37,9 @@ enum dyd_achievement_identifiers
 	A_MISC_STASH2,
 	A_DUELS_PISTOL1,
 	A_DUELS_PISTOL2,
-	A_DUELS_PISTOL3
+	A_DUELS_PISTOL3,
+	A_MISC_PLAYTIME3,
+	A_DUELS_ENGAGE4
 };
 
 struct dyd_achievement
@@ -60,6 +63,7 @@ struct dyd_playerdata
 {
 	int saberbarrier_cooldown[MAX_CLIENTS];
 	int weapon_on_death[MAX_CLIENTS];
+	int mentalshield_cooldown[MAX_CLIENTS];
 };
 
 
