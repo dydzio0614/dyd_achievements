@@ -3,7 +3,7 @@
 #pragma warning (disable: 4996)
 
 //plugin info
-plugininfo_t g_plugininfo = { "dydplugin", "1.2.1", "Lugormod U# 2.4.9 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR }; //when changing version, update /achievements help version too
+plugininfo_t g_plugininfo = { "dydplugin", "1.2.2", "Lugormod U# 2.4.9 Achievement System", "Dydzio", "", 1, 1, 1, JASS_PIFV_MAJOR, JASS_PIFV_MINOR }; //when changing version, update /achievements help version too
 pluginres_t* g_result = NULL;
 eng_syscall_t g_syscall = NULL;
 mod_vmMain_t g_vmMain = NULL;
@@ -82,17 +82,17 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 								char* bitmaskValue = Accounts_Custom_GetValue(targetAccount, "ACHIEVEMENTS");
 								if (bitmaskValue != NULL && (unsigned long)strtol(bitmaskValue, NULL, 0) & GetAchievementBitmaskFromID(ID))
 								{
-									if (targetAccount->credits >= achievementToRemove->reward_credits) //WRESZCIE
+									unsigned long newBitmask = (unsigned long)strtol(bitmaskValue, NULL, 0) & ~(GetAchievementBitmaskFromID(ID));
+									Accounts_Custom_SetValue(targetAccount, "ACHIEVEMENTS", JASS_VARARGS("%lu", newBitmask));
+									g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1Achievement removed from account.\n\"");
+
+									if (targetAccount->credits >= achievementToRemove->reward_credits)
 									{
 										targetAccount->credits -= achievementToRemove->reward_credits;
 										targetAccount->modifiedTime = g_level->time;
-										unsigned long newBitmask = (unsigned long)strtol(bitmaskValue, NULL, 0) & ~(GetAchievementBitmaskFromID(ID));
-										Accounts_Custom_SetValue(targetAccount, "ACHIEVEMENTS", JASS_VARARGS("%lu", newBitmask));
-										g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1Achievement removed from account.\n\"");
 									}
 									else
-										g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1Insufficient credits on target account to revert achievement.\n\"");
-
+										g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^6Credits were not taken away - insufficient amount.\n\"");
 								}
 								else
 									g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1Player did not complete mentioned achievement.\n\"");
@@ -179,7 +179,12 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while using a vehicle.\n\"");
 					JASS_RET_SUPERCEDE(1);
 				}
-				//add check "if player is busy"
+
+				if (user->client->ps.duelInProgress)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while dueling.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
 
 				if ((user->client->ps.fd.forceGripUseTime > g_level->time || user->client->ps.forceHandExtend != HANDEXTEND_NONE
 					|| (user->client->ps.weaponTime > 0) && (!(user->client->Lmd.restrict & 16) || user->client->pers.Lmd.persistantFlags & 16))
@@ -231,6 +236,12 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 					JASS_RET_SUPERCEDE(1);
 				}
 
+				if (user->client->ps.duelInProgress)
+				{
+					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You cannot use this command while dueling.\n\"");
+					JASS_RET_SUPERCEDE(1);
+				}
+
 				if (fabs(user->client->ps.velocity[0]) > 50.0f || fabs(user->client->ps.velocity[1]) > 50.0f || fabs(user->client->ps.velocity[2]) > 50.0f)
 				{
 					g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^1You have to stand still when using this skill.\n\"");
@@ -250,29 +261,6 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 			}
 			JASS_RET_IGNORED(1);
 		}
-
-		/*if (!stricmp(command, "slap"))
-		{
-			char buf[MAX_NETNAME];
-			int result;
-			if (g_syscall(G_ARGC) < 2)
-			{
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "print \"^3Usage: slap <name>\n\"");
-				JASS_RET_SUPERCEDE(1);
-			}
-			g_syscall(G_ARGV, 1, buf, sizeof(buf));
-			result = ClientNumberFromString(user, buf);
-			if (result != -1)
-			{
-				gentity_t *victim = GetEnt(result);
-				victim->client->ps.velocity[0] = 250;
-				victim->client->ps.velocity[1] = 150;
-				victim->client->ps.velocity[2] = 50;
-				G_Knockdown(victim, 500);
-				g_syscall(G_SEND_SERVER_COMMAND, arg0, "cp \"%s has been slapped!\n\", victim->client->pers.netname");
-			}
-			JASS_RET_SUPERCEDE(1);
-		}*/
 
 		//achievements
 
@@ -403,7 +391,7 @@ C_DLLEXPORT int JASS_vmMain(int cmd, int arg0, int arg1, int arg2, int arg3, int
 				
 			else if (!stricmp(arg, "help")) //end of categories
 			{
-				DispContiguous(user, "^6Lugormod achievement system by ^0Dyd^1zio^6, version 1.2.1");
+				DispContiguous(user, "^6Lugormod achievement system by ^0Dyd^1zio^6, version 1.2.2");
 				DispContiguous(user, "^5It allows two possible kinds of achievements: Claimable achievements, where player must force completion manually, and automatic achievements, where completion and reward are autogranted.");
 				DispContiguous(user, "^5Achievements are assigned to categories, what becomes helpful if number of achievements is large. Special category \'claimable\' shows claimable achievements from all other categories.");
 				DispContiguous(user, "^3Possible syntax: \nachievements <category> - displays achievements from category.");
