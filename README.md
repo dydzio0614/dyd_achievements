@@ -1,6 +1,6 @@
 # dyd_achievements
 
-Star Wars Jedi Knight: Jedi Academy server-side lugormod plugin, which adds simple achievements to the game.
+Star Wars Jedi Knight: Jedi Academy server-side lugormod plugin, which adds simple achievements to the game. Was used on EU lugormod for a while (http://lugormod.tk).
 
 Can be opened using Visual Studio 2010 or later.
 
