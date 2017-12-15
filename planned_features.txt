@@ -1,0 +1,13 @@
+This file contains few ideas that were originally planned for further investigation and development:
+
+Legendary achievements - separate category, very hard to get
+Temporary achievements - separate category?
+Bugfix report achievements (handy, isn't it?)
+Killstreak achievements
+Player speed reached achievements
+Achievement completion sound
+Prerequirements
+Mind blow bolt - missile with repeater's main fire fx, target receives limb_break
+Levelable special abilities - for example missile with demp main fx that can get damage, speed, extra missiles like bowcaster, special effects on hit, depending on completed achievements
+Teleport mine/detpack blowup achievement
+Vehicle kill achievement
